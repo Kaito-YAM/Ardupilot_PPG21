@@ -137,7 +137,12 @@ enum log_messages {
     LOG_PPG1_MSG,
     LOG_PPG2_MSG,
     LOG_PPG3_MSG,
-    LOG_PPG4_MSG
+    LOG_PPG4_MSG,
+    LOG_PPG5_MSG,
+    LOG_PPG6_MSG,
+    LOG_PPG_2D_1_MSG,  // Added by Kaito Yamamoto 2021.07.21.
+    LOG_PPG_2D_2_MSG,  // Added by Kaito Yamamoto 2021.07.21.
+    LOG_PPG_2D_3_MSG,  // Added by Kaito Yamamoto 2021.07.21.
 };
 
 #define MASK_LOG_ATTITUDE_FAST          (1<<0)

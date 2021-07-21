@@ -1617,75 +1617,110 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(TPARAM_alternate,    "TPARAM_alternate",   0),
 
-    // @Param: TPARAM_theta_a
-    // @DisplayName: TPARAM_theta_a
+    // @Param: TPARAM_alternate
+    // @DisplayName: TPARAM_alternate
     // @Description: TLab parameter, chante the orbiting direction
     // @Range: -100 100
     // @User: Advanced
     GSCALAR(TPARAM_theta_a,    "TPARAM_theta_a",   18),
 
-    // @Param: TPARAM_V_a
-    // @DisplayName: TPARAM_V_a
+    // @Param: TPARAM_alternate
+    // @DisplayName: TPARAM_alternate
     // @Description: TLab parameter, chante the orbiting direction
     // @Range: -100 100
     // @User: Advanced
     GSCALAR(TPARAM_V_a,    "TPARAM_V_a",   6.4),
 
-    // @Param: TPARAM_cha_pow
-    // @DisplayName: TPARAM_cha_pow
+    // @Param: TPARAM_alternate
+    // @DisplayName: TPARAM_alternate
     // @Description: TLab parameter, chante the orbiting direction
     // @Range: -100 100
     // @User: Advanced
     GSCALAR(TPARAM_cha_pow,    "TPARAM_cha_pow",   2),
 
-    // @Param: TPARAM_MAX_slo
-    // @DisplayName: TPARAM_MAX_slo
+    // @Param: TPARAM_alternate
+    // @DisplayName: TPARAM_alternate
     // @Description: TLab parameter, chante the orbiting direction
     // @Range: -100 100
     // @User: Advanced
     GSCALAR(TPARAM_MAX_slo,    "TPARAM_MAX_slo",   80),
 
-    // @Param: TPARAM_neutral_t
-    // @DisplayName: TPARAM_neutral_t
+    // @Param: TPARAM_alternate
+    // @DisplayName: TPARAM_alternate
     // @Description: TLab parameter, chante the orbiting direction
     // @Range: -100 100
     // @User: Advanced
     GSCALAR(TPARAM_neutral_t,    "TPARAM_neutral_t",   35),
 
-    // @Param: TPARAM_switch_mo
-    // @DisplayName: TPARAM_switch_mo
+    // @Param: TPARAM_alternate
+    // @DisplayName: TPARAM_alternate
     // @Description: TLab parameter, chante the orbiting direction
     // @Range: -100 100
     // @User: Advanced
     GSCALAR(TPARAM_switch_mo,    "TPARAM_switch_mo",   1),
 
-    // @Param: TPARAM_control_a
-    // @DisplayName: TPARAM_control_a
+    // @Param: TPARAM_alternate
+    // @DisplayName: TPARAM_alternate
     // @Description: TLab parameter, chante the orbiting direction
     // @Range: -100 100
     // @User: Advanced
     GSCALAR(TPARAM_control_a,    "TPARAM_control_a",   7.5),
 
-    // @Param: TPARAM_control_b
-    // @DisplayName: TPARAM_control_b
+    // @Param: TPARAM_alternate
+    // @DisplayName: TPARAM_alternate
     // @Description: TLab parameter, chante the orbiting direction
     // @Range: -100 100
     // @User: Advanced
     GSCALAR(TPARAM_control_b,    "TPARAM_control_b",   0.03),
 
-    // @Param: TPARAM_control_p
-    // @DisplayName: TPARAM_control_p
+    // @Param: TPARAM_alternate
+    // @DisplayName: TPARAM_alternate
     // @Description: TLab parameter, chante the orbiting direction
     // @Range: -100 100
     // @User: Advanced
     GSCALAR(TPARAM_control_p,    "TPARAM_control_p",   1.7),
 
-    // @Param: TPARAM_L_1
-    // @DisplayName: TPARAM_L_1
+    // @Param: TPARAM_alternate
+    // @DisplayName: TPARAM_alternate
     // @Description: TLab parameter, chante the orbiting direction
     // @Range: -100 100
     // @User: Advanced
     GSCALAR(TPARAM_L_1,    "TPARAM_L_1",   39),
+
+    // @Param: TPARAM_R_KI
+    // @DisplayName: TPARAM_R_KI
+    // @Description: TLab parameter, KI controller
+    // @Range: 0 1
+    // @User: TLAB
+    GSCALAR(TPARAM_R_KI,    "TPARAM_R_KI",   0.1),
+
+    // @Param: TPARAM_LQR_f1
+    // @DisplayName: TPARAM_LQR_f1
+    // @Description: TLab parameter, LQR gain
+    // @Range: -100 100
+    // @User: TLAB
+    GSCALAR(TPARAM_LQR_f1,    "TPARAM_LQR_f1",   1.4142),
+
+    // @Param: TPARAM_LQR_f2
+    // @DisplayName: TPARAM_LQR_f2
+    // @Description: TLab parameter, LQR gain
+    // @Range: -100 100
+    // @User: TLAB
+    GSCALAR(TPARAM_LQR_f2,    "TPARAM_LQR_f2",   3.7128),
+
+    // @Param: TPARAM_LQR_f3
+    // @DisplayName: TPARAM_LQR_f3
+    // @Description: TLab parameter, LQR gain
+    // @Range: -100 100
+    // @User: TLAB
+    GSCALAR(TPARAM_LQR_f3,    "TPARAM_LQR_f3",   0.0026),
+
+    // @Param: TPARAM_LQR_f4
+    // @DisplayName: TPARAM_LQR_f4
+    // @Description: TLab parameter, LQR gain
+    // @Range: -100 100
+    // @User: TLAB
+    GSCALAR(TPARAM_LQR_f4,    "TPARAM_LQR_f4",   0.0075),
 
     // Added by Kaito Yamamoto 2021.07.12.
 
@@ -1863,7 +1898,6 @@ const AP_Param::Info Plane::var_info[] = {
     // @Range: 0 180
     // @User: Advanced
     GSCALAR(TPARAM_chiF_max_deg,    "TP2D_ChiFMaxDeg",   178.f),
-
 
     AP_VAREND
 };

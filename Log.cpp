@@ -208,6 +208,11 @@ void Plane::Log_Write_Fast(void)
     Log_Write_PPG2(); // added by iwase 17/07/28
     Log_Write_PPG3(); // added by iwase 17/08/04
     Log_Write_PPG4(); // added by iwase 17/08/14
+    Log_Write_PPG5(); // added by aoki 21/03/25
+    Log_Write_PPG6(); // added by hatae 210414
+    Log_Write_PPG_2D_1();  // Added by Kaito Yamamoto 2021.07.21.
+    Log_Write_PPG_2D_2();  // Added by Kaito Yamamoto 2021.07.21.
+    Log_Write_PPG_2D_3();  // Added by Kaito Yamamoto 2021.07.21.
 }
 
 struct PACKED log_Performance {
@@ -508,6 +513,146 @@ void Plane::Log_Write_PPG4()
 
 //
 
+struct PACKED log_PPG5 {
+    LOG_PACKET_HEADER;
+    uint64_t time_us;
+    float dz_f;
+    float gps_dh;
+    float gps_dpitch;
+};
+
+void Plane::Log_Write_PPG5()
+{
+    struct log_PPG5 pkt = {
+            LOG_PACKET_HEADER_INIT(LOG_PPG5_MSG),
+            time_us         : AP_HAL::micros64(),
+            dz_f            : dz_f,
+            gps_dh          : gps_dh,
+            gps_dpitch		: gps_dpitch
+    };
+    DataFlash.WriteBlock(&pkt, sizeof(pkt));
+}
+
+struct PACKED log_PPG6 {
+    LOG_PACKET_HEADER;
+    uint64_t time_us;
+    float h_0;
+    float h_1;
+    float h_2;
+    float h_3;
+    float h_4;
+    float h_5;
+    float h_6;
+    float h_7;
+};
+
+void Plane::Log_Write_PPG6()
+{
+    struct log_PPG6 pkt = {
+            LOG_PACKET_HEADER_INIT(LOG_PPG6_MSG),
+            time_us         : AP_HAL::micros64(),
+            h_0				: h_0,
+            h_1				: h_1,
+            h_2				: h_2,
+            h_3				: h_3,
+            h_4				: h_4,
+            h_5				: h_5,
+            h_6				: h_6,
+            h_7				: h_7
+    };
+    DataFlash.WriteBlock(&pkt, sizeof(pkt));
+}
+
+// Added by Kaito Yamamoto 2021.07.21.
+struct PACKED log_PPG_2D_1 {
+    LOG_PACKET_HEADER;
+    uint64_t t_now;  // 現在の時刻 [us]
+    float dt;  // サンプリング時間間隔 [s]
+    float xI;  // 慣性x座標(緯度方向) [m]
+    float yI;  // 慣性y座標(経度方向) [m]
+    float psi;  // ヨー角(機首方位角) [rad] (0 ~ 2PI)
+    float chi;  // 航路角 [rad] (0 ~ 2PI)
+    float v_g;  // 対地速度の大きさ [m/s]
+    float s;
+    float zeta;
+    float dot_zeta;
+};
+
+// Added by Kaito Yamamoto 2021.07.21.
+void Plane::Log_Write_PPG_2D_1()
+{
+    struct log_PPG_2D_1 pkt = {
+            LOG_PACKET_HEADER_INIT(LOG_PPG_2D_1_MSG),
+            t_now		: t_now,
+            dt			: dt,
+            xI			: xI,
+            yI			: yI,
+            psi			: psi,
+            chi			: chi,
+            v_g			: v_g,
+            s			: s,
+            zeta		: zeta,
+            dot_zeta	: dot_zeta
+    };
+    DataFlash.WriteBlock(&pkt, sizeof(pkt));
+}
+
+// Added by Kaito Yamamoto 2021.07.21.
+struct PACKED log_PPG_2D_2 {
+    LOG_PACKET_HEADER;
+    float x_d, y_d, chi_d, dot_chi_d;
+    float kappa;
+    float u_x, u_chi;
+    float xF, yF, chiF;
+};
+
+// Added by Kaito Yamamoto 2021.07.21.
+void Plane::Log_Write_PPG_2D_2()
+{
+    struct log_PPG_2D_2 pkt = {
+            LOG_PACKET_HEADER_INIT(LOG_PPG_2D_2_MSG),
+            x_d			: x_d,
+            y_d			: y_d,
+            chi_d		: chi_d,
+            dot_chi_d	: dot_chi_d,
+            kappa		: kappa,
+            u_x			: u_x,
+            u_chi		: u_chi,
+            xF			: xF,
+            yF			: yF,
+            chiF		: chiF
+    };
+    DataFlash.WriteBlock(&pkt, sizeof(pkt));
+}
+
+// Added by Kaito Yamamoto 2021.07.21.
+struct PACKED log_PPG_2D_3 {
+    LOG_PACKET_HEADER;
+    float ds;
+    float K1, K2, M1, M2;
+    float h1, h2, h3, h4;
+    int32_t d_angle;
+};
+
+// Added by Kaito Yamamoto 2021.07.21.
+void Plane::Log_Write_PPG_2D_3()
+{
+    struct log_PPG_2D_3 pkt = {
+            LOG_PACKET_HEADER_INIT(LOG_PPG_2D_3_MSG),
+            ds		: ds,
+            K1		: K1,
+            K2		: K2,
+            M1		: M1,
+            M2		: M2,
+            h1		: h[0],
+            h2		: h[1],
+            h3		: h[2],
+            h4		: h[3],
+            d_angle	: d_angle
+    };
+    DataFlash.WriteBlock(&pkt, sizeof(pkt));
+}
+
 struct PACKED log_Status {
     LOG_PACKET_HEADER;
     uint64_t time_us;
@@ -520,6 +665,7 @@ struct PACKED log_Status {
     uint8_t stage;
     bool impact;
 };
+
 
 void Plane::Log_Write_Status()
 {
@@ -716,6 +862,17 @@ const struct LogStructure Plane::log_structure[] = {
       "PPG3", "QiiiiiifI",  "TimeUS,mlat,mLng,pLat,pLng,cLat,cLng,mThn,dt" },
     { LOG_PPG4_MSG, sizeof(log_PPG4),
       "PPG4", "QffbHf",  "TimeUS,dtheta,itheta,c_mode,cmd_id,power15" },
+    { LOG_PPG5_MSG, sizeof(log_PPG5),
+      "PPG5", "Qfff",  "TimeUS,dz_f,gps_dh,gps_dpitch" },//add by aoki
+    { LOG_PPG6_MSG, sizeof(log_PPG6),
+      "PPG6", "Qffffffff",  "TimeUS,h_0,h_1,h_2,h_3,h_4,h_5,h_6,h_7" },
+    // Added by Kaito Yamamoto 2021.07.21.
+    { LOG_PPG_2D_1_MSG, sizeof(log_PPG_2D_1),
+      "P2D1", "Qfffffffff", "TimeUS, dt, xI, yI, psi, chi, v_g, s, zeta, dzeta" },
+    { LOG_PPG_2D_2_MSG, sizeof(log_PPG_2D_2),
+      "P2D2", "ffffffffff", "x_d, y_d, chi_d, dchi_d, kappa, u_x, u_chi, xF, yF, chiF" },
+    { LOG_PPG_2D_3_MSG, sizeof(log_PPG_2D_3),
+      "P2D3", "fffffffffi", "ds, K1, K2, M1, M2, h1, h2, h3, h4, d_angle" },
 };
 
 #if CLI_ENABLED == ENABLED

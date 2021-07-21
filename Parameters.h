@@ -396,6 +396,11 @@ public:
         k_param_TPARAM_control_a,
         k_param_TPARAM_control_b,
         k_param_TPARAM_L_1,
+        k_param_TPARAM_R_KI,
+        k_param_TPARAM_LQR_f1,
+        k_param_TPARAM_LQR_f2,
+        k_param_TPARAM_LQR_f3,
+        k_param_TPARAM_LQR_f4,
 
         // Added by Kaito Yamamoto 2021.07.12.
         k_param_TPARAM_v_a,
@@ -650,6 +655,11 @@ public:
     AP_Float TPARAM_control_b;
     AP_Float TPARAM_control_p;
     AP_Float TPARAM_L_1;
+    AP_Float TPARAM_R_KI;
+    AP_Float TPARAM_LQR_f1;
+    AP_Float TPARAM_LQR_f2;
+    AP_Float TPARAM_LQR_f3;
+    AP_Float TPARAM_LQR_f4;
 
     // Added by Kaito Yamamoto 2021.07.12.
     AP_Float TPARAM_v_a;

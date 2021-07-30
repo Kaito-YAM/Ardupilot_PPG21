@@ -203,12 +203,12 @@ void Plane::Log_Write_Fast(void)
     if (should_log(MASK_LOG_NTUN)){
         Log_Write_Nav_Tuning();
     }
-    Log_Write_PPG0(); // added by iwase 17/07/28
-    Log_Write_PPG1(); // added by iwase 17/07/28
-    Log_Write_PPG2(); // added by iwase 17/07/28
-    Log_Write_PPG3(); // added by iwase 17/08/04
+    //Log_Write_PPG0(); // added by iwase 17/07/28
+    //Log_Write_PPG1(); // added by iwase 17/07/28
+    //Log_Write_PPG2(); // added by iwase 17/07/28
+    //Log_Write_PPG3(); // added by iwase 17/08/04
     Log_Write_PPG4(); // added by iwase 17/08/14
-    Log_Write_PPG5(); // added by aoki 21/03/25
+    //Log_Write_PPG5(); // added by aoki 21/03/25
     Log_Write_PPG6(); // added by hatae 210414
     Log_Write_PPG_2D_1();  // Added by Kaito Yamamoto 2021.07.21.
     Log_Write_PPG_2D_2();  // Added by Kaito Yamamoto 2021.07.21.
@@ -566,13 +566,13 @@ void Plane::Log_Write_PPG6()
 // Added by Kaito Yamamoto 2021.07.21.
 struct PACKED log_PPG_2D_1 {
     LOG_PACKET_HEADER;
-    uint64_t t_now;  // ç¾åœ¨ã®æ™‚åˆ» [us]
-    float dt;  // ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°æ™‚é–“é–“éš” [s]
-    float xI;  // æ…£æ€§xåº§æ¨™(ç·¯åº¦æ–¹å‘) [m]
-    float yI;  // æ…£æ€§yåº§æ¨™(çµŒåº¦æ–¹å‘) [m]
-    float psi;  // ãƒ¨ãƒ¼è§’(æ©Ÿé¦–æ–¹ä½è§’) [rad] (0 ~ 2PI)
-    float chi;  // èˆªè·¯è§’ [rad] (0 ~ 2PI)
-    float v_g;  // å¯¾åœ°é€Ÿåº¦ã®å¤§ãã• [m/s]
+    uint64_t t_now;  // Œ»İ‚Ì [us]
+    float dt;  // ƒTƒ“ƒvƒŠƒ“ƒOŠÔŠÔŠu [s]
+    float xI;  // Šµ«xÀ•W(ˆÜ“x•ûŒü) [m]
+    float yI;  // Šµ«yÀ•W(Œo“x•ûŒü) [m]
+    float psi;  // ƒˆ[Šp(‹@ñ•ûˆÊŠp) [rad] (0 ~ 2PI)
+    float chi;  // q˜HŠp [rad] (0 ~ 2PI)
+    float v_g;  // ‘Î’n‘¬“x‚Ì‘å‚«‚³ [m/s]
     float s;
     float zeta;
     float dot_zeta;
@@ -832,8 +832,14 @@ const struct LogStructure Plane::log_structure[] = {
       "PM",  "QHHIII",  "TimeUS,NLon,NLoop,MaxT,MinT,LogDrop" },
     { LOG_STARTUP_MSG, sizeof(log_Startup),         
       "STRT", "QBH",         "TimeUS,SType,CTot" },
-    { LOG_CTUN_MSG, sizeof(log_Control_Tuning),     
+    // Commented out by Kaito Yamamoto 2021.07.23.
+    /*
+    { LOG_CTUN_MSG, sizeof(log_Control_Tuning),
       "CTUN", "Qiiiibii",    "TimeUS,nWlat,nWlng,pWlat,pWlng,cmode,clat,clng" },
+    */
+    // Added by Kaito Yamamoto 2021.07.23.
+    { LOG_CTUN_MSG, sizeof(log_Control_Tuning),     
+      "CTUN", "Qiiiibii",    "TimeUS,pWlat,pWlng,nWlat,nWlng,cmode,clat,clng" },
 //      "CTUN", "Qiiii",    "TimeUS,nWlat,nWlng,pWlat,pWlng" },
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
       "NTUN", "QffffffIfi",  "TimeUS,z,z_r,e_m,de_m,per,dpitch,dt,motor_Th_N,value2" },

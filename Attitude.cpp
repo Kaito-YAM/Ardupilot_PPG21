@@ -518,8 +518,8 @@ int32_t Plane::TLAB_Throttle_Controller(void)
     gps_dh = -gps.velocity().z;//add by aoki
     gps_dpitch= wrap_PI(ahrs.get_gyro().y);//added by hatae
 
-    //2.49(N)å¹³è¡¡ç‚¹ï¼ˆãƒŸãƒƒã‚·ãƒ§ãƒ³ãƒ—ãƒ©ãƒ³ãƒŠãƒ¼ã‚ˆã‚Šå…¥åŠ›ï¼‰
-    //â†“é¢¨æ´å®Ÿé¨“ã®å¼ã‚’ä½¿ç”¨ã—ã¦å¹³è¡¡ç‚¹(N)ã®è¨ˆç®—
+    //2.49(N)•½t“_iƒ~ƒbƒVƒ‡ƒ“ƒvƒ‰ƒ“ƒi[‚æ‚è“ü—Íj
+    //«•—“´ÀŒ±‚Ì®‚ğg—p‚µ‚Ä•½t“_(N)‚ÌŒvZ
     if(g.TPARAM_cha_pow == 1){
     	//PD? Controller(Iwase or Nishizuka)
         motor_Th_N = (1/cosf(g.TPARAM_theta_a*M_PI/180))*(0.1059*g.TPARAM_V_a*g.TPARAM_V_a-0.3342*g.TPARAM_V_a +1.6227);
@@ -607,7 +607,7 @@ int32_t Plane::TLAB_Throttle_Controller(void)
         h[6]=constrain_float(mem_M[1]*mem_N[1]*mem_L[0], 0.0f, 1.0f);
         h[7]=constrain_float(mem_M[1]*mem_N[1]*mem_L[1], 0.0f, 1.0f);
 
-        //ãƒ­ã‚°ç”¨(ä¸€æ™‚çš„ã«ä½¿ç”¨)
+        //ƒƒO—p(ˆê“I‚Ég—p)
         h_0=h[0];
         h_1=h[1];
         h_2=h[2];
@@ -646,34 +646,34 @@ int32_t Plane::TLAB_Throttle_Controller(void)
     }
     // Commented out by Kaito Yamamoto 2021.07.20.
     /*else if(g.TPARAM_cha_pow == 6){
-    	//æœ€å¤§å€¤æœ€å°å€¤è¨­å®š
+    	//Å‘å’lÅ¬’lİ’è
         float max_z1=1.5;
         float min_z1=-1.5;
         float max_z2=10.0/180.0*M_PI;
         float min_z2=-10.0/180.0*M_PI;
         float max_z3=80.0/180.0*M_PI;
         float min_z3=-80.0/180.0*M_PI;
-        //å¹³è¡¡ç‚¹å‘¨ã‚Šã®å¤‰æ•°
+        //•½t“_ü‚è‚Ì•Ï”
         float theta_n=15.8/180.0*M_PI;
         float T_neutral=4.46;
         float theta_r=ahrs.pitch-theta_n;
-        //z1ã‹ã‚‰z3ã®è¨­å®š
+        //z1‚©‚çz3‚Ìİ’è
         float z1=gps_dh;
         float z2=theta_r;
         float z3=gps_dpitch;
-        //ãƒ¡ãƒ³ãƒã‚·ãƒƒãƒ—é–¢æ•°æŒ‡å®š
+        //ƒƒ“ƒoƒVƒbƒvŠÖ”w’è
         float mem_M[2];
         float mem_N[2];
         float mem_L[2];
         float h[8];
-        //ãƒ¡ãƒ³ãƒã‚·ãƒƒãƒ—é–¢æ•°
+        //ƒƒ“ƒoƒVƒbƒvŠÖ”
         mem_M[0]=(max_z1-z1)/(max_z1-min_z1);
         mem_M[1]=(z1-min_z1)/(max_z1-min_z1);
         mem_N[0]=(max_z2-z2)/(max_z2-min_z2);
         mem_N[1]=(z2-min_z2)/(max_z2-min_z2);
         mem_L[0]=(max_z3-z3)/(max_z3-min_z3);
         mem_L[1]=(z3-min_z3)/(max_z3-min_z3);
-        //ãƒ¡ãƒ³ãƒã‚·ãƒƒãƒ—é–¢æ•°ã‚’0to1ã«é™å®š
+        //ƒƒ“ƒoƒVƒbƒvŠÖ”‚ğ0to1‚ÉŒÀ’è
         if (mem_M[0]>1){
         	mem_M[0]=1;
         	mem_M[1]=0;
@@ -684,7 +684,7 @@ int32_t Plane::TLAB_Throttle_Controller(void)
         	mem_L[0]=1;
         	mem_L[1]=0;
         }
-        //ãƒ¡ãƒ³ãƒã‚·ãƒƒãƒ—é–¢æ•°è¨ˆç®—
+        //ƒƒ“ƒoƒVƒbƒvŠÖ”ŒvZ
         int num=0;
         for (int i=0;i<2;i++){
           for (int j=0;j<2;j++){
@@ -694,7 +694,7 @@ int32_t Plane::TLAB_Throttle_Controller(void)
             }
           }
         }
-        //ãƒ­ã‚°æ®‹ã—ç”¨å¤‰æ•°
+        //ƒƒOc‚µ—p•Ï”
         h_0=h[0];
         h_1=h[1];
         h_2=h[2];
@@ -703,7 +703,7 @@ int32_t Plane::TLAB_Throttle_Controller(void)
         h_5=h[5];
         h_6=h[6];
         h_7=h[7];
-        //ãƒ•ã‚£ãƒ¼ãƒ‰ãƒãƒƒã‚¯ã‚²ã‚¤ãƒ³æŒ‡å®š
+        //ƒtƒB[ƒhƒoƒbƒNƒQƒCƒ“w’è
         float f[8][4]={
         	{0.4116,3.3118,-0.31973,-0.035216},
             {0.41501,3.0882,-0.10037,-0.5691},
@@ -715,7 +715,7 @@ int32_t Plane::TLAB_Throttle_Controller(void)
             {0.49748,3.2449,-0.6896,0.80952}
         };
         float x_r[4]={e_m,gps_dh,theta_r,gps_dpitch};
-        //æ¨åŠ›è¨ˆç®—
+        //„—ÍŒvZ
         motor_Th_N=T_neutral;
         float motor_Th_N_i;
         for (int i=0;i<8;i++){
@@ -727,7 +727,7 @@ int32_t Plane::TLAB_Throttle_Controller(void)
         }
     }
     */
-    //â†“motor_Th_NãŒã‚¹ãƒ”ã‚³ãƒ³å¤‰æ›ç”¨ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’é€šã—ã¦%å‡ºåŠ›ã«ãªã‚‹
+    //«motor_Th_N‚ªƒXƒsƒRƒ“•ÏŠ·—p‚ÌƒvƒƒOƒ‰ƒ€‚ğ’Ê‚µ‚Ä%o—Í‚É‚È‚é
     motor_per = thrust_to_percent(motor_Th_N);
     return static_cast<int32_t>(motor_per);
 }
@@ -814,13 +814,13 @@ void Plane::calc_nav_yaw_coordinated(float speed_scaler)
 
     // Commented out by Kaito Yamamoto 2021.07.12.
     /*
-    if(!Combine_Mode_flag){ //å††ã¨ç›´ç·šã®çµ„ã¿åˆã‚ã›é£›è¡Œã§ã¯ãªã„
+    if(!Combine_Mode_flag){ //‰~‚Æ’¼ü‚Ì‘g‚İ‡‚í‚¹”òs‚Å‚Í‚È‚¢
         switch(TLAB_Control_flag){
-        case 1: // å††è¿½å¾“å·¦æ—‹å›
-        case 2: //ã€€å††è¿½å¾“å³æ—‹å›
+        case 1: // ‰~’Ç]¶ù‰ñ
+        case 2: //@‰~’Ç]‰Eù‰ñ
             steering_control.rudder = constrain_int16(TLAB_Circle_Trace_Controller(), -4500, 4500);
             break;
-        default : //0 -> ç›´ç·šè¿½å¾“
+        default : //0 -> ’¼ü’Ç]
             steering_control.rudder = constrain_int16(TLAB_Line_Trace_Controller(), -4500, 4500);
             break;
         }
@@ -850,7 +850,7 @@ void Plane::init_TLAB_Controller(void)
     target_R = g.TPARAM_R;
     U_min = g.TPARAM_U_min;
     U_max = g.TPARAM_U_max;
-    // æ¯”è¼ƒãƒ•ã‚¡ã‚¸ã‚£åˆ¶å¾¡ç”¨
+    // ”äŠrƒtƒ@ƒWƒB§Œä—p
     if (g.TPARAM_rule_num != 0) {
         use_fuzzy_controller = true;
         (g.TPARAM_rule_num == 2)?(rule_num = 2):(rule_num = 4);
@@ -866,13 +866,13 @@ void Plane::init_TLAB_Controller(void)
     }else{
         use_fuzzy_controller = false;
     }
-    // å††ã¨ç›´ç·šã®çµ„ã¿åˆã‚ã›é£›è¡Œç”¨
-    Combine_Mode_flag = (g.TPARAM_Combine==1);//g.TPARAM=1ã®ã¨ãçœŸ(æ¯”è¼ƒæ¼”ç®—å­)
+    // ‰~‚Æ’¼ü‚Ì‘g‚İ‡‚í‚¹”òs—p
+    Combine_Mode_flag = (g.TPARAM_Combine==1);//g.TPARAM=1‚Ì‚Æ‚«^(”äŠr‰‰Zq)
     TLAB_WP_nav_flag = false;
     alternate_orbit_flag = (g.TPARAM_alternate==1);
     change_to_circle_flag = false;
     if (Combine_Mode_flag){
-        TLAB_Control_flag = 0; //çµ„ã¿åˆã‚ã›é£›è¡Œã®æ™‚ã¯æœ€åˆã¯å¿…ãšç›´ç·šè¿½å¾“ãƒ¢ãƒ¼ãƒ‰
+        TLAB_Control_flag = 0; //‘g‚İ‡‚í‚¹”òs‚Ì‚ÍÅ‰‚Í•K‚¸’¼ü’Ç]ƒ‚[ƒh
     }
     change_y = g.TPARAM_change_y;
     orbit_num = g.TPARAM_orbit_num;
@@ -896,7 +896,7 @@ float Plane::calc_controller(float x1, float x2)
         prev_POS = current_loc;
     }
 
-    if (!use_fuzzy_controller){ // æœ‰ç†å¤šé …å¼ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
+    if (!use_fuzzy_controller){ // —L—‘½€®ƒRƒ“ƒgƒ[ƒ‰
         // 2017-08-03no1 decay rate
         //    float C = -0.00064483*x1*x1*x1 - 0.0076749*x1*x1*x2 + 0.0052302*x1*x2*x2 - 0.00095738*x2*x2*x2
         //            + 1.6742e-10*x1*x1 + 1.9249e-09*x1*x2 - 3.6543e-10*x2*x2 - 0.0017774*x1 - 0.029072*x2;
@@ -941,7 +941,7 @@ float Plane::calc_controller(float x1, float x2)
 
         return C/p;
 
-    }else{ // æ¯”è¼ƒç”¨Fuzzyã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©
+    }else{ // ”äŠr—pFuzzyƒRƒ“ƒgƒ[ƒ‰
         float m_mem[2];
         float n_mem[2];
         if(v_g > Vg_max){
@@ -1051,10 +1051,10 @@ int32_t Plane::TLAB_Line_Trace_Controller()
     //y_set = g.TPARAM_y_set;
     //a_bottom = atanf(y_set);
     //a_above = g.TPARAM_control_miu * M_PI /2;
-    //ãƒ­ã‚°è¡¨ç¤º
+    //ƒƒO•\¦
     //det_a = pow(a_above,2)/pow(a_bottom,2);
     sinc_kai = sinc(state_UAV_GCRS);
-    //ã“ã“ã¾ã§
+    //‚±‚±‚Ü‚Å
     det_a=g.TPARAM_control_a;
     det_b=g.TPARAM_control_b;
     det_p=g.TPARAM_control_p;
@@ -1157,7 +1157,7 @@ int32_t Plane::TLAB_Circle_Trace_Controller(void)
     }else{
         Vg_limited = v_g;
     }
-    //ä»¥ä¸‹3è¡Œã¯prev_locationã®æ›´æ–°ã§ã‚ã‚‹ã€‚ã“ã‚ŒãŒãªã„ã¨ãŠã‹ã—ãªã“ã¨ã«ãªã‚‹ã€‚
+    //ˆÈ‰º3s‚Íprev_location‚ÌXV‚Å‚ ‚éB‚±‚ê‚ª‚È‚¢‚Æ‚¨‚©‚µ‚È‚±‚Æ‚É‚È‚éB
     if(prev_POS.lat != current_loc.lat || prev_POS.lng != current_loc.lng){
             prev_POS = current_loc;
         }
@@ -1187,10 +1187,10 @@ int32_t Plane::TLAB_Circle_Trace_Controller(void)
         //y_set = g.TPARAM_y_set;
         //a_bottom = atanf(y_set);
         //a_above = g.TPARAM_control_miu * M_PI /2;
-        //ãƒ­ã‚°è¡¨ç¤º
+        //ƒƒO•\¦
         //det_a = pow(a_above,2)/pow(a_bottom,2);
         //sinc_kai = sinc(state_UAV_GCRS);
-        //ã“ã“ã¾ã§
+        //‚±‚±‚Ü‚Å
         det_a=g.TPARAM_control_a;
         det_b=g.TPARAM_control_b;
         det_p=g.TPARAM_control_p;
@@ -1264,28 +1264,28 @@ int32_t Plane::TLAB_Combine_Controller(void)
     if (!TLAB_WP_nav_flag){
         TLAB_Control_flag = 0;
         return TLAB_Line_Trace_Controller();
-    }//TLAB_WP_nav_flagãŒçœŸã§ãªã„ã¨ãä¸Šã®ifæ–‡å®Ÿè¡Œ(L638ã‚ˆã‚Šçµ„ã¿åˆã‚ã›ã®ã¨ãã¯falseã«ãªã‚‹)
+    }//TLAB_WP_nav_flag‚ª^‚Å‚È‚¢‚Æ‚«ã‚Ìif•¶Às(L638‚æ‚è‘g‚İ‡‚í‚¹‚Ì‚Æ‚«‚Ífalse‚É‚È‚é)
 
-    if(TLAB_Control_flag == 0){ //ç›´ç·šè¿½å¾“ãƒ¢ãƒ¼ãƒ‰ã®æ™‚
+    if(TLAB_Control_flag == 0){ //’¼ü’Ç]ƒ‚[ƒh‚Ì
         if(change_to_circle_flag){
             change_to_circle_flag = false;
             Target_Circle_Center = prev_WP_loc;
-            init_TLAB_Controller_AUTO_flag = true; //æ¬¡å††è¿½å¾“ãƒ¢ãƒ¼ãƒ‰ã«ãªã£ãŸæ™‚ã«thetaã¨ã‹åˆæœŸåŒ–ã™ã‚‹ãŸã‚
+            init_TLAB_Controller_AUTO_flag = true; //Ÿ‰~’Ç]ƒ‚[ƒh‚É‚È‚Á‚½‚Étheta‚Æ‚©‰Šú‰»‚·‚é‚½‚ß
             if (alternate_orbit_flag){
-                TLAB_Control_flag = static_cast<int8_t>((TLAB_CMD_index % 2) + 1);//ä½™ã‚Šã‚’è¨ˆç®—ã—ã¦å·¦å³1,2ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹
+                TLAB_Control_flag = static_cast<int8_t>((TLAB_CMD_index % 2) + 1);//—]‚è‚ğŒvZ‚µ‚Ä¶‰E1,2‚ğØ‚è‘Ö‚¦‚é
             }else{
-                (g.TPARAM_control_mode == 1)?(TLAB_Control_flag = 1):(TLAB_Control_flag = 2); //ç¢ºå®Ÿã«å††è¿½å¾“ãƒ¢ãƒ¼ãƒ‰ã«åˆ‡ã‚Šæ›¿ãˆã‚‹,alternate=0ã§ç¢ºå®Ÿã«å·¦å³ã©ã¡ã‚‰ã‹ä¸€æ–¹
+                (g.TPARAM_control_mode == 1)?(TLAB_Control_flag = 1):(TLAB_Control_flag = 2); //ŠmÀ‚É‰~’Ç]ƒ‚[ƒh‚ÉØ‚è‘Ö‚¦‚é,alternate=0‚ÅŠmÀ‚É¶‰E‚Ç‚¿‚ç‚©ˆê•û
             }
             gcs_send_text_fmt(MAV_SEVERITY_INFO, "change to circle trace mode");
             return TLAB_Circle_Trace_Controller();
         }else{
             return TLAB_Line_Trace_Controller();
         }
-    }else{ //å††è¿½å¾“ãƒ¢ãƒ¼ãƒ‰ã®æ™‚
+    }else{ //‰~’Ç]ƒ‚[ƒh‚Ì
         Target_Circle_Center = prev_WP_loc;
-        int32_t u_kari = TLAB_Line_Trace_Controller(); //WPåº§æ¨™ç³»ã§ã®xã¨yã‚’è¨ˆç®—ã™ã‚‹ãŸã‚
+        int32_t u_kari = TLAB_Line_Trace_Controller(); //WPÀ•WŒn‚Å‚Ìx‚Æy‚ğŒvZ‚·‚é‚½‚ß
         if((fabsf(Int_theta) > 2*M_PI*orbit_num) && (state_UAV_x > 0.0f) && (fabsf(state_UAV_y) < change_y)){
-            //thetaã®ç©åˆ†ãŒ(2ãƒ‘ã‚¤)x(ä½•é€±(orbit))ã‚’è¶…ãˆãŸã‚‰ç›´ç·šã«åˆ‡ã‚Šæ›¿ãˆè¶…ãˆã¦ã„ãªã‘ã‚Œã°ãã®ã¾ã¾å††è¿½å¾“
+            //theta‚ÌÏ•ª‚ª(2ƒpƒC)x(‰½T(orbit))‚ğ’´‚¦‚½‚ç’¼ü‚ÉØ‚è‘Ö‚¦’´‚¦‚Ä‚¢‚È‚¯‚ê‚Î‚»‚Ì‚Ü‚Ü‰~’Ç]
             TLAB_Control_flag = 0;
             Int_theta = 0;
             gcs_send_text_fmt(MAV_SEVERITY_INFO, "change to line trace mode");
@@ -1297,17 +1297,19 @@ int32_t Plane::TLAB_Combine_Controller(void)
 }
 
 /* ##### Added by Kaito Yamamoto 2021.07.11. #####
- * æ¦‚è¦: Plane::TLAB_2D_Trace_Controller(void)å†…ã®å¤‰æ•°ã®åˆæœŸåŒ–
+ * ŠT—v: Plane::TLAB_2D_Trace_Controller(void)“à‚Ì•Ï”‚Ì‰Šú‰»
 */
 void Plane::init_TLAB_2D_Trace_Controller(void){
-	// å®Ÿæ©Ÿã«å›ºæœ‰ãªå®šæ•°
-	v_a = g.TPARAM_v_a;  // å¯¾æ°—é€Ÿåº¦ã®å¤§ãã• [m/s]: const
-	k = g.TPARAM_k;  // ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ãƒãƒ¼è§’åº¦ [rad]ã¨æ—‹å›é€Ÿåº¦ [rad/s]ã®æ¯”ä¾‹å®šæ•° [1/s]
-	// ç›®æ¨™çµŒè·¯ã®é¸æŠ
-	Path_Origin.lat = g.TPARAM_Path_Origin_lat;  // ç›®æ¨™çµŒè·¯ã®åŸç‚¹ä½ç½®ã®è¨­å®š: ç·¯åº¦ [1e-7*deg]
-    Path_Origin.lng = g.TPARAM_Path_Origin_lng;  // ç›®æ¨™çµŒè·¯ã®åŸç‚¹ä½ç½®ã®è¨­å®š: çµŒåº¦ [1e-7*deg]
-	Path_Mode = g.TPARAM_Path_Mode;  // ç›®æ¨™çµŒè·¯ã®è¨­å®š
-	// ãƒ•ã‚£ãƒ¼ãƒ‰ãƒãƒƒã‚¯ã‚²ã‚¤ãƒ³  Fx[3], Fchi[4][3]
+	// À‹@‚ÉŒÅ—L‚È’è”
+	v_a = g.TPARAM_v_a;  // ‘Î‹C‘¬“x‚Ì‘å‚«‚³ [m/s]: const
+	k = g.TPARAM_k;  // ƒRƒ“ƒgƒ[ƒ‹ƒo[Šp“x [rad]‚Æù‰ñ‘¬“x [rad/s]‚Ì”ä—á’è” [1/s]
+	// –Ú•WŒo˜H‚Ì‘I‘ğ
+	//Path_Origin.lat = g.TPARAM_Path_Origin_lat;  // –Ú•WŒo˜H‚ÌŒ´“_ˆÊ’u‚Ìİ’è(int32_t): ˆÜ“x [1e-7*deg]
+    //Path_Origin.lng = g.TPARAM_Path_Origin_lng;  // –Ú•WŒo˜H‚ÌŒ´“_ˆÊ’u‚Ìİ’è(int32_t): Œo“x [1e-7*deg]
+    Path_Origin.lat = prev_WP_loc.lat;  // –Ú•WŒo˜H‚ÌŒ´“_ˆÊ’u‚Ìİ’è(int32_t): ˆÜ“x [1e-7*deg]
+    Path_Origin.lng = prev_WP_loc.lng;  // –Ú•WŒo˜H‚ÌŒ´“_ˆÊ’u‚Ìİ’è(int32_t): Œo“x [1e-7*deg]
+	Path_Mode = g.TPARAM_Path_Mode;  // –Ú•WŒo˜H‚Ìİ’è
+	// ƒtƒB[ƒhƒoƒbƒNƒQƒCƒ“  Fx[3], Fchi[4][3]
 	Fx[0] = g.TPARAM_Fx1;
 	Fx[1] = g.TPARAM_Fx2;
 	Fx[2] = g.TPARAM_Fx3;
@@ -1323,44 +1325,57 @@ void Plane::init_TLAB_2D_Trace_Controller(void){
 	Fchi[3][0] = g.TPARAM_Fchi4_1;
 	Fchi[3][1] = g.TPARAM_Fchi4_2;
 	Fchi[3][2] = g.TPARAM_Fchi4_3;
-	// ãƒ•ã‚¡ã‚¸ã‚£åŒ–ç¯„å›²(const)
+	// ƒtƒ@ƒWƒB‰»”ÍˆÍ(const)
 	v_g_min = g.TPARAM_v_g_min;  // default: 3 [m/s]
 	v_g_max = g.TPARAM_v_g_max;  // default: 10 [m/s]
 	kappa_max = g.TPARAM_kappa_max;
 	kappa_min = g.TPARAM_kappa_min;
 	u_x_max = g.TPARAM_u_x_max;
 	chiF_max = g.TPARAM_chiF_max_deg*M_PI/180.f;  // default: 178/180*PI [rad]
-	// éç·šå½¢é …ã®æœ€å¤§ãƒ»æœ€å°å€¤
+	// ”ñüŒ`€‚ÌÅ‘åEÅ¬’l
 	z1_max = (v_g_max + u_x_max)*kappa_max;
 	z1_min = (v_g_max + u_x_max)*kappa_min;
 	z2_max = v_g_max;
 	z2_min = v_g_max*sinf(chiF_max)/chiF_max;
-	// åˆæœŸå€¤
-	s = 0;  // çµŒè·¯é•· [m] >= 0
-	zeta = 0;  // åª’ä»‹å¤‰æ•° >= 0
-	first_time = true;  // åˆå›ãƒ«ãƒ¼ãƒ—ã®åˆ¤å®šãƒ•ãƒ©ã‚°
-	t_now = AP_HAL::micros64();  // ç¾åœ¨ã®æ™‚åˆ» [us]
+	// ‰Šú’l
+	s = 0;  // Œo˜H’· [m] >= 0
+	zeta = 0;  // ”}‰î•Ï” >= 0
+	i_prev_CMD = 0;
+	u_x = 0;
+	t_now = AP_HAL::micros64();  // Œ»İ‚Ì [us]
 }
 
 
 /* ##### Added by Kaito Yamamoto 2021.07.11. #####
- * "ç›®æ¨™çµŒè·¯ã®ç”Ÿæˆ"
- * æ¦‚è¦: ç›®æ¨™ç‚¹ P ã®æ…£æ€§åº§æ¨™ä½ç½®ã‚„ç›®æ¨™èˆªè·¯è§’ã‚’ç¾åœ¨ã®çµŒè·¯é•· s ã‹ã‚‰ç”Ÿæˆã™ã‚‹
+ * "–Ú•WŒo˜H‚Ì¶¬"
+ * ŠT—v: –Ú•W“_ P ‚ÌŠµ«À•WˆÊ’u‚â–Ú•Wq˜HŠp‚ğŒ»İ‚ÌŒo˜H’· s ‚©‚ç¶¬‚·‚é
 */
 void Plane::TLAB_generate_2D_Path(void){
+	uint16_t i_now_CMD = TLAB_CMD_index;
+	// WP’Ê‰ß‚ğ‚µ‚ÄCMDƒCƒ“ƒfƒbƒNƒX‚ªƒCƒ“ƒNƒŠƒƒ“ƒg‚³‚ê‚½‚Æ‚«
+	if (i_now_CMD != i_prev_CMD) {
+		// ƒpƒ‰ƒƒgƒŠƒbƒN‹Èü‚ÌØ‚è‘Ö‚¦: s, zeta ‚Ì‰Šú‰»
+		s = 0;
+		zeta = 0;
+	}
+	i_prev_CMD = i_now_CMD;
+
 	float zeta_prev = zeta;
+	float dist_WPs = get_distance(prev_WP_loc, next_WP_loc);  // 2‚Â‚ÌWPŠÔ‚Ì‹——£ [m]
+	Vector2f P0 = location_diff(Path_Origin, prev_WP_loc);  // ’¼‘O‚ÌWP: –Ú•WŒo˜H’†S‚©‚ç‚Ì•ÏˆÊ(N.E <-> x,y) [m]
+	Vector2f P1 = location_diff(Path_Origin, next_WP_loc);  // Ÿ‚ÌWP: –Ú•WŒo˜H’†S‚©‚ç‚Ì•ÏˆÊ(N.E <-> x,y) [m]
 	switch (Path_Mode) {
-	// Mode 0: ç›´ç·š
+	// Mode 0: 2‚Â‚ÌWP‚Å’è‹`‚³‚ê‚é’¼üŒo˜H
 	case 0:
-		zeta = s;  // åª’ä»‹å¤‰æ•°ã®æ›´æ–° (s ã®é–¢æ•°)
+		zeta = s/dist_WPs;  // ”}‰î•Ï”‚ÌXV (s ‚ÌŠÖ”)
 		dot_zeta = (zeta - zeta_prev)/dt;
-		x_d = zeta;
-		y_d = 0;
-		chi_d = 0;
+		x_d = zeta*P0.x + (1 - zeta)*P1.x;  // [m]
+		y_d = zeta*P0.y + (1 - zeta)*P1.y;  // [m]
+		chi_d = atan2f((P1.y - P0.y), (P1.x - P0.x));  // [rad]: (-PI ~ PI)
 		dot_chi_d = 0;
 		kappa = 0;
 		break;
-	// Mode 1: å††(å·¦æ—‹å›)ã€€L02-01ã‚’å‚è€ƒã«ã—ãŸå ´åˆ
+	// Mode 1: ‰~(¶ù‰ñ)@L02-01‚ğQl‚É‚µ‚½ê‡
 	case 1:
 		zeta = s/50.f;
 		dot_zeta = (zeta - zeta_prev)/dt;
@@ -1370,10 +1385,10 @@ void Plane::TLAB_generate_2D_Path(void){
 		dot_chi_d = -dot_zeta;
 		kappa = 1/50.f;
 		break;
-	// Mode 2: å††(å³æ—‹å›) L02-03ã‚’å‚è€ƒã«ã—ãŸå ´åˆ
+	// Mode 2: ‰~(‰Eù‰ñ) L02-03‚ğQl‚É‚µ‚½ê‡
 	case 2:
 		zeta = s/50.f;
-		dot_zeta = (zeta - zeta_prev)/dt;  // 0å‰²ã‚ŠãŒç™ºç”Ÿã—å¾—ã‚‹(èµ·å‹•æ™‚)
+		dot_zeta = (zeta - zeta_prev)/dt;  // 0Š„‚è‚ª”­¶‚µ“¾‚é(‹N“®)
 		x_d = 50.f*cosf(zeta + 0.5f*M_PI);
 		y_d = -50.f*sinf(zeta + 0.5f*M_PI);
 		chi_d = atan2f(-sinf(zeta), -cosf(zeta));
@@ -1388,48 +1403,48 @@ void Plane::TLAB_generate_2D_Path(void){
 
 
 /* ##### Added by Kaito Yamamoto 2021.07.11. #####
- * "PPGã€€2æ¬¡å…ƒçµŒè·¯è¿½å¾“ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©"
- * å‚è€ƒæ–‡çŒ®: é«˜æ©‹è£•å¾³ã•ã‚“ã®ä¿®è«–(2016), ãƒŸãƒ¼ãƒ†ã‚£ãƒ³ã‚°è³‡æ–™2021/05/16 etc.
- * æ¦‚è¦: ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ãƒãƒ¼ã®ã‚µãƒ¼ãƒœãƒ¢ãƒ¼ã‚¿è§’åº¦ [cdeg.]ã‚’è¨ˆç®—ã—ã¦è¿”ã™
- * åˆ¶å¾¡ç›®çš„: è¨­å®šã—ãŸ2æ¬¡å…ƒçµŒè·¯ã¸ã®è¿½å¾“ï¼ˆã‚»ãƒ¬ãƒ»ãƒ•ãƒ¬ãƒåº§æ¨™ç³»ã«ãŠã‘ã‚‹ãƒ¬ã‚®ãƒ¥ãƒ¬ãƒ¼ã‚¿ã¨ã—ã¦è¨­è¨ˆï¼‰
+ * "PPG@2ŸŒ³Œo˜H’Ç]ƒRƒ“ƒgƒ[ƒ‰"
+ * Ql•¶Œ£: ‚‹´—T“¿‚³‚ñ‚ÌC˜_(2016), ƒ~[ƒeƒBƒ“ƒO‘—¿2021/05/16 etc.
+ * ŠT—v: ƒRƒ“ƒgƒ[ƒ‹ƒo[‚ÌƒT[ƒ{ƒ‚[ƒ^Šp“x [cdeg.]‚ğŒvZ‚µ‚Ä•Ô‚·
+ * §Œä–Ú“I: İ’è‚µ‚½2ŸŒ³Œo˜H‚Ö‚Ì’Ç]iƒZƒŒEƒtƒŒƒlÀ•WŒn‚É‚¨‚¯‚éƒŒƒMƒ…ƒŒ[ƒ^‚Æ‚µ‚ÄİŒvj
 */
 int32_t Plane::TLAB_2D_Trace_Controller(void){
-	// å¤‰æ•°ã®åˆæœŸè¨­å®š
-	if (first_time) {
+	// •Ï”‚Ì‰Šúİ’è
+	if (!yet_init) {
 		init_TLAB_2D_Trace_Controller();
-		first_time = false;
-		return 0;  // dt = 0 ã«ã‚ˆã‚‹0å‰²ã‚Šã‚’é˜²ããŸã‚
+		yet_init = true;
+		return 0;  // dt = 0 ‚É‚æ‚é0Š„‚è‚ğ–h‚®‚½‚ß
 	}
 
-	// æ…£æ€§åº§æ¨™ç³»ã«ãŠã‘ã‚‹ç¾åœ¨ã®çŠ¶æ…‹ã®æ›´æ–°(IMU + GPS + Barometer)
-	uint64_t t_prev = t_now;  // ç›´å‰ã®æ™‚åˆ» [us]
-	t_now = AP_HAL::micros64();  // ç¾åœ¨ã®æ™‚åˆ» [us]
-	dt = (t_now - t_prev)*1.e-6f;  // ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°æ™‚é–“é–“éš” [s]
-	Vector2f xyI = location_diff(current_loc, Path_Origin);  // ç¾åœ¨åœ°ç‚¹: ç›®æ¨™çµŒè·¯ä¸­å¿ƒã‹ã‚‰ã®å¤‰ä½(N.E <-> x,y) [m]
-	xI = xyI.x;  // æ…£æ€§xåº§æ¨™(ç·¯åº¦æ–¹å‘) [m]
-	yI = xyI.y;  // æ…£æ€§yåº§æ¨™(çµŒåº¦æ–¹å‘) [m]
-	psi = wrap_2PI(ahrs.yaw);  // ãƒ¨ãƒ¼è§’(æ©Ÿé¦–æ–¹ä½è§’) [rad] (0 ~ 2PI)
-	chi = wrap_2PI(gps.ground_course()*M_PI/180.0f);  // èˆªè·¯è§’ [rad] (0 ~ 2PI)
-	v_g = gps.ground_speed();  // å¯¾åœ°é€Ÿåº¦ã®å¤§ãã• [m/s]
+	// Šµ«À•WŒn‚É‚¨‚¯‚éŒ»İ‚Ìó‘Ô‚ÌXV(IMU + GPS + Barometer)
+	uint64_t t_prev = t_now;  // ’¼‘O‚Ì [us]
+	t_now = AP_HAL::micros64();  // Œ»İ‚Ì [us]
+	dt = (t_now - t_prev)*1.e-6f;  // ƒTƒ“ƒvƒŠƒ“ƒOŠÔŠÔŠu [s]
+	Vector2f xyI = location_diff(Path_Origin, current_loc);  // Œ»İ’n“_: –Ú•WŒo˜H’†S‚©‚ç‚Ì•ÏˆÊ(N.E <-> x,y) [m]
+	xI = xyI.x;  // Šµ«xÀ•W(ˆÜ“x•ûŒü) [m]
+	yI = xyI.y;  // Šµ«yÀ•W(Œo“x•ûŒü) [m]
+	psi = wrap_2PI(ahrs.yaw);  // ƒˆ[Šp(‹@ñ•ûˆÊŠp) [rad] (0 ~ 2PI)
+	chi = wrap_2PI(gps.ground_course()*M_PI/180.0f);  // q˜HŠp [rad]: (0 ~ 2PI)
+	v_g = gps.ground_speed();  // ‘Î’n‘¬“x‚Ì‘å‚«‚³ [m/s]
 
-	// çµŒè·¯ç”Ÿæˆ: çµŒè·¯æƒ…å ±(ç›®æ¨™ç‚¹ P ã®æ…£æ€§åº§æ¨™ etc.)ã‚’ç¾åœ¨ã®çµŒè·¯é•· s ã‹ã‚‰è¨ˆç®—ã™ã‚‹
+	// Œo˜H¶¬: Œo˜Hî•ñ(–Ú•W“_ P ‚ÌŠµ«À•W etc.)‚ğŒ»İ‚ÌŒo˜H’· s ‚©‚çŒvZ‚·‚é
 	TLAB_generate_2D_Path();
 
-	// æ…£æ€§åº§æ¨™ç³»{I}ã‹ã‚‰ã‚»ãƒ¬ãƒ»ãƒ•ãƒ¬ãƒåº§æ¨™ç³»{F}ã¸ã®å¤‰æ›
-	float e_xI = x_d - xI;  // æ…£æ€§åº§æ¨™ x ã®åˆ¶å¾¡åå·® [m]
-	float e_yI = y_d - yI;  // æ…£æ€§åº§æ¨™ y ã®åˆ¶å¾¡åå·® [m]
+	// Šµ«À•WŒn{I}‚©‚çƒZƒŒEƒtƒŒƒlÀ•WŒn{F}‚Ö‚Ì•ÏŠ·
+	float e_xI = x_d - xI;  // Šµ«À•W x ‚Ì§Œä•Î· [m]
+	float e_yI = y_d - yI;  // Šµ«À•W y ‚Ì§Œä•Î· [m]
 	xF = - cosf(chi_d)*e_xI + sinf(chi_d)*e_yI;  // [m]
 	yF = - sinf(chi_d)*e_xI - cosf(chi_d)*e_yI;  // [m]
-	chiF = chi_d - chi;  // [rad]
-	float X[3] = {xF, yF, chiF};  // çŠ¶æ…‹å¤‰æ•°ãƒ™ã‚¯ãƒˆãƒ«
+	chiF = wrap_PI(chi_d - chi);  // [rad]: (-PI ~ PI)
+	float X[3] = {xF, yF, chiF};  // ó‘Ô•Ï”ƒxƒNƒgƒ‹
 
-	// ãƒ¡ãƒ³ãƒãƒ¼ã‚·ãƒƒãƒ—é–¢æ•°ã®è¨ˆç®—
-	// éç·šå½¢é …
-	float z1 = (v_g*cosf(chiF) + u_x)*kappa;  // ä¿‚æ•°è¡Œåˆ—ã®éç·šå½¢é … 1
-	float z2 = v_g*sinf(chiF)/chiF;  // ä¿‚æ•°è¡Œåˆ—ã®éç·šå½¢é …2
-	// K1, K2, M1, M2 ã®è¨ˆç®—
+	// ƒƒ“ƒo[ƒVƒbƒvŠÖ”‚ÌŒvZ
+	// ”ñüŒ`€
+	float z1 = (v_g*cosf(chiF) + u_x)*kappa;  // ŒW”s—ñ‚Ì”ñüŒ`€ 1
+	float z2 = v_g*sinf(chiF)/chiF;  // ŒW”s—ñ‚Ì”ñüŒ`€2
+	// K1, K2, M1, M2 ‚ÌŒvZ
 	if (chiF == 0) {
-		// 0å‰²ã‚Šå¯¾ç­–
+		// 0Š„‚è‘Îô
 		K1 = 1;
 		K2 = 0;
 	}
@@ -1437,9 +1452,9 @@ int32_t Plane::TLAB_2D_Trace_Controller(void){
 		K1 = (z2 - z2_min)/(z2_max - z2_min);
 		K2 = (z2_max - z2)/(z2_max - z2_min);
 	}
-	M1 = (z1 - z1_min)/(z1_max - z1_min);  // åˆ†æ¯ã¯å®šæ•°ãªã®ã§0å‰²ã‚Šã¯èµ·ã“ã‚Šå¾—ãªã„
+	M1 = (z1 - z1_min)/(z1_max - z1_min);  // •ª•ê‚Í’è”‚È‚Ì‚Å0Š„‚è‚Í‹N‚±‚è“¾‚È‚¢
 	M2 = (z1_max - z1)/(z1_max - z1_min);
-	// K1, K2, M1, M2 ã®ä¸Šé™ãƒ»ä¸‹é™ã‚«ãƒƒãƒˆ
+	// K1, K2, M1, M2 ‚ÌãŒÀE‰ºŒÀƒJƒbƒg
 	if (K1 > 1) {
 		K1 = 1;
 		K2 = 0;
@@ -1456,21 +1471,21 @@ int32_t Plane::TLAB_2D_Trace_Controller(void){
 		M1 = 0;
 		M2 = 1;
 	}
-	// ãƒ¡ãƒ³ãƒãƒ¼ã‚·ãƒƒãƒ—é–¢æ•° h[1]~h[4] ã®è¨ˆç®—
+	// ƒƒ“ƒo[ƒVƒbƒvŠÖ” h[1]~h[4] ‚ÌŒvZ
 	h[0] = K1*M1;
 	h[1] = K2*M1;
 	h[2] = K1*M2;
 	h[3] = K2*M2;
 
-	// åˆ¶å¾¡å…¥åŠ› u_x ã®è¨ˆç®—
-	float u_x_calc = 0;  // è¨ˆç®—ç”¨
+	// §Œä“ü—Í u_x ‚ÌŒvZ
+	float u_x_calc = 0;  // ŒvZ—p
 	for (int i = 0; i < 3; i++) {
 		u_x_calc -= Fx[i]*X[i];
 	}
 	u_x = u_x_calc;
 
-	// åˆ¶å¾¡å…¥åŠ› u_chi ã®è¨ˆç®—
-	float u_chi_calc = 0;  // è¨ˆç®—ç”¨
+	// §Œä“ü—Í u_chi ‚ÌŒvZ
+	float u_chi_calc = 0;  // ŒvZ—p
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 3; j++) {
 			u_chi_calc -= Fchi[i][j]*X[j];
@@ -1478,11 +1493,11 @@ int32_t Plane::TLAB_2D_Trace_Controller(void){
 	}
 	u_chi = u_chi_calc;
 
-	// çµŒè·¯é•·  s ã®æ›´æ–°(æ•°å€¤ç©åˆ†)
-	ds = u_x + cosf(chiF);  // ç›®æ¨™ç‚¹ P ã®ç§»å‹•é€Ÿåº¦ [m/s]
-	s += ds*dt;  // çµŒè·¯é•·ã®æ›´æ–°å¼
+	// Œo˜H’·  s ‚ÌXV(”’lÏ•ª)
+	ds = u_x + v_g*cosf(chiF);  // –Ú•W“_ P ‚ÌˆÚ“®‘¬“x [m/s]
+	s += ds*dt;  // Œo˜H’·‚ÌXV® [m]
 
-	// u_chi [rad/s] ã‚’ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ãƒãƒ¼è§’åº¦ servo [cdeg] ã¸å¤‰æ›
+	// u_chi [rad/s] ‚ğƒRƒ“ƒgƒ[ƒ‹ƒo[Šp“x servo [cdeg] ‚Ö•ÏŠ·
     d_angle = static_cast<int32_t>(1/k*v_g/v_a/cosf(chi - psi)*(-u_chi + dot_chi_d)*100.0f*180.0f/M_PI);  // [cdeg]
     bar_angle = d_angle + g.TPARAM_servo_neutral*100;  // [cdeg]
     return bar_angle;

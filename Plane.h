@@ -858,6 +858,7 @@ private:
     void Log_Write_PPG_2D_1();  // Added by Kaito Yamamoto 2021.07.21.
     void Log_Write_PPG_2D_2();  // Added by Kaito Yamamoto 2021.07.21.
     void Log_Write_PPG_2D_3();  // Added by Kaito Yamamoto 2021.07.21.
+    void Log_Write_PPG_2D_4();  // Added by Kaito Yamamoto 2021.08.05.
     void Log_Write_Status();
     void Log_Write_Sonar();
     void Log_Write_Optflow();
@@ -1262,7 +1263,11 @@ private:
 
     // ##### Added by Kaito Yamamoto 2021.07.11. #####
     bool yet_init;  // 初回ループの判定フラグ
+    bool change_path_flag;
+    Vector2f P0;
+    Vector2f P1;
     uint8_t Path_Mode;  // 追従経路の種類を指定(0~255)
+    uint8_t Flight_Plan;  // 飛行プラン(Path_Modeをどのように切り替えるか)を指定(0~255)
     Location Path_Origin;  // 目標経路の原点 GPS座標
     float k;
     //float v_a;  // 対気速度の大きさ [m/s]: const
@@ -1280,14 +1285,18 @@ private:
     //float chi;  // 航路角 [rad] (0 ~ 2PI)
     //float v_g;  // 対地速度の大きさ [m/s]
     float s;  // 経路長 [m]
+    float s_calc;
     float zeta;  // 媒介変数(経路長 s と目標状態量の対応)
-    uint16_t i_prev_CMD;
+    uint16_t i_now_CMD;
+    uint16_t i_zeta;
+    float dist_WPs;  // 直線追従モードにおけるP0,P1間の距離 [m]
     float dot_zeta;  // 媒介変数の時間微分
     float x_d;  // 目標位置 x 座標(慣性座標系)
     float y_d;  // 目標位置 y 座標(慣性座標系)
     float chi_d;  // 目標航路角 [rad] (慣性座標系)
     float dot_chi_d;  // 目標航路角速度 [rad/s] (慣性座標系)
     float kappa;  // 曲率 [rad/m]
+    float u_x_calc;  // u_x 計算用: 範囲オーバー分をカットしない
     float u_x;  // ds の操作量 [m/s]: コントローラの出力
     float u_chi;  // 目標旋回速度 [rad/s]: コントローラの出力
     float xF;  // 位置 x [m] (セレ・フレネ座標系)

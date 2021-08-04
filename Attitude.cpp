@@ -1296,11 +1296,11 @@ int32_t Plane::TLAB_Combine_Controller(void)
     }
 }
 
-/* ##### Added by Kaito Yamamoto 2021.07.11. #####
+/* ##### Added by Kaito Yamamoto 2021.08.04. #####
  * 概要: Plane::TLAB_2D_Trace_Controller(void)内の変数の初期化
 */
 void Plane::init_TLAB_2D_Trace_Controller(void){
-	// 実機に固有な定数
+	// UAVに固有な定数
 	v_a = g.TPARAM_v_a;  // 対気速度の大きさ [m/s]: const
 	k = g.TPARAM_k;  // コントロールバー角度 [rad]と旋回速度 [rad/s]の比例定数 [1/s]
 	// 目標経路の選択
@@ -1308,7 +1308,7 @@ void Plane::init_TLAB_2D_Trace_Controller(void){
     //Path_Origin.lng = g.TPARAM_Path_Origin_lng;  // 目標経路の原点位置の設定(int32_t): 経度 [1e-7*deg]
     Path_Origin.lat = prev_WP_loc.lat;  // 目標経路の原点位置の設定(int32_t): 緯度 [1e-7*deg]
     Path_Origin.lng = prev_WP_loc.lng;  // 目標経路の原点位置の設定(int32_t): 経度 [1e-7*deg]
-	Path_Mode = g.TPARAM_Path_Mode;  // 目標経路の設定
+    Flight_Plan = g.TPARAM_Flight_Plan;  // フライトプランの設定
 	// フィードバックゲイン  Fx[3], Fchi[4][3]
 	Fx[0] = g.TPARAM_Fx1;
 	Fx[1] = g.TPARAM_Fx2;
@@ -1338,9 +1338,13 @@ void Plane::init_TLAB_2D_Trace_Controller(void){
 	z2_max = v_g_max;
 	z2_min = v_g_max*sinf(chiF_max)/chiF_max;
 	// 初期値
+	Path_Mode = 0;  // 目標経路の設定
 	s = 0;  // 経路長 [m] >= 0
 	zeta = 0;  // 媒介変数 >= 0
-	i_prev_CMD = 0;
+	P0 = location_diff(Path_Origin, prev_WP_loc);  // P0を更新: 目標経路中心からの変位(N.E <-> x,y) [m]
+	P1 = location_diff(Path_Origin, next_WP_loc);  // P1を更新: 目標経路中心からの変位(N.E <-> x,y) [m]
+	dist_WPs = get_distance(prev_WP_loc, next_WP_loc);  // 2つのWP間の距離 [m]を更新
+	i_now_CMD = 0;
 	u_x = 0;
 	t_now = AP_HAL::micros64();  // 現在の時刻 [us]
 }
@@ -1351,49 +1355,97 @@ void Plane::init_TLAB_2D_Trace_Controller(void){
  * 概要: 目標点 P の慣性座標位置や目標航路角を現在の経路長 s から生成する
 */
 void Plane::TLAB_generate_2D_Path(void){
-	uint16_t i_now_CMD = TLAB_CMD_index;
-	// WP通過をしてCMDインデックスがインクリメントされたとき
-	if (i_now_CMD != i_prev_CMD) {
-		// パラメトリック曲線の切り替え: s, zeta の初期化
-		s = 0;
-		zeta = 0;
-	}
-	i_prev_CMD = i_now_CMD;
-
+	uint16_t i_prev_CMD = i_now_CMD;
+	i_now_CMD = TLAB_CMD_index;  // CMDインデックスの更新
 	float zeta_prev = zeta;
-	float dist_WPs = get_distance(prev_WP_loc, next_WP_loc);  // 2つのWP間の距離 [m]
-	Vector2f P0 = location_diff(Path_Origin, prev_WP_loc);  // 直前のWP: 目標経路中心からの変位(N.E <-> x,y) [m]
-	Vector2f P1 = location_diff(Path_Origin, next_WP_loc);  // 次のWP: 目標経路中心からの変位(N.E <-> x,y) [m]
+
+	if (s < 0) {
+		s = 0;
+	}
+
+	// フライトプランを指定する
+	switch (Flight_Plan) {
+	// Mode 0: HP -(直線)-> WP1 -(直線)-> WP2 -...
+	// 指定WP -- N個 (何個でも指定可能.ただし,HPはAUTOモードに切り替えた地点が割り当てられる.)
+	case 0:
+		Path_Mode = 0;
+		// AUTOモードに切り替わり,WPがセットされたとき
+		if (zeta < 0.5 && i_now_CMD != i_prev_CMD) {
+			// 直線経路を更新(初回なので定義)する
+			dist_WPs = get_distance(prev_WP_loc, next_WP_loc);  // 2つのWP間の距離 [m]を更新
+			P0 = location_diff(Path_Origin, prev_WP_loc);  // P0を更新: 目標経路中心からの変位(N.E <-> x,y) [m]
+			P1 = location_diff(Path_Origin, next_WP_loc);  // P1を更新: 目標経路中心からの変位(N.E <-> x,y) [m]
+		}
+		// WP半径内に到達し,WPが新たにセットされたとき
+		else if (zeta >= 0.5 && i_now_CMD != i_prev_CMD) {
+			// 次に媒介変数zetaが1に達したときに,P0
+			change_path_flag = true;
+		}
+		// WP半径内に到達したあとで,zetaが1に到達したとき
+		if (change_path_flag == true && zeta >= 1) {
+			// 直線経路の切り替え: s, zeta の初期化
+			s = 0;
+			zeta = 0;
+			change_path_flag = false;
+			// 直線経路の更新
+			dist_WPs = get_distance(prev_WP_loc, next_WP_loc);  // 2つのWP間の距離 [m]を更新
+			P0 = location_diff(Path_Origin, prev_WP_loc);  // P0を更新: 目標経路中心からの変位(N.E <-> x,y) [m]
+			P1 = location_diff(Path_Origin, next_WP_loc);  // P1を更新: 目標経路中心からの変位(N.E <-> x,y) [m]
+		}
+		break;
+	}
+
+	float dPdzeta = 0;
+	// 経路の種類を指定する
 	switch (Path_Mode) {
-	// Mode 0: 2つのWPで定義される直線経路
+	// Mode 0: 2点のWP(P0, P1)で定義される直線経路
 	case 0:
 		zeta = s/dist_WPs;  // 媒介変数の更新 (s の関数)
-		dot_zeta = (zeta - zeta_prev)/dt;
-		x_d = zeta*P0.x + (1 - zeta)*P1.x;  // [m]
-		y_d = zeta*P0.y + (1 - zeta)*P1.y;  // [m]
+		dot_zeta = (zeta - zeta_prev)/dt;  // 使わない
+		x_d = (1 - zeta)*P0.x + zeta*P1.x;  // [m]
+		y_d = (1 - zeta)*P0.y + zeta*P1.y;  // [m]
 		chi_d = atan2f((P1.y - P0.y), (P1.x - P0.x));  // [rad]: (-PI ~ PI)
 		dot_chi_d = 0;
 		kappa = 0;
 		break;
-	// Mode 1: 円(左旋回)　L02-01を参考にした場合
+	// Mode 1: 2点のWP(P0, P1)で定義される円経路(左旋回)
 	case 1:
-		zeta = s/50.f;
-		dot_zeta = (zeta - zeta_prev)/dt;
-		x_d = 50.f*cosf(zeta + 0.75f*M_PI);
-		y_d = 50.f*sinf(zeta + 0.75f*M_PI);
-		chi_d = atan2f(sinf(zeta + 0.25f*M_PI), -cosf(zeta + 0.25f*M_PI));
-		dot_chi_d = -dot_zeta;
-		kappa = 1/50.f;
+		zeta = s/dist_WPs*2;
+		dot_zeta = (zeta - zeta_prev)/dt;  // 使わない
+		x_d = dist_WPs/2*cosf(zeta) + (P0.x + P1.x)/2;
+		y_d = dist_WPs/2*sinf(zeta) + (P0.y + P1.y)/2;
+		chi_d = atan2f(cosf(zeta), sinf(zeta));
+		dot_chi_d = - dot_zeta;
+		kappa = 2/dist_WPs;
 		break;
-	// Mode 2: 円(右旋回) L02-03を参考にした場合
+	// Mode 2: 2点のWP(P0, P1)で定義される円経路(右旋回)
 	case 2:
-		zeta = s/50.f;
-		dot_zeta = (zeta - zeta_prev)/dt;  // 0割りが発生し得る(起動時)
-		x_d = 50.f*cosf(zeta + 0.5f*M_PI);
-		y_d = -50.f*sinf(zeta + 0.5f*M_PI);
-		chi_d = atan2f(-sinf(zeta), -cosf(zeta));
+		zeta = s/dist_WPs*2;
+		dot_zeta = (zeta - zeta_prev)/dt;  // 使わない
+		x_d = dist_WPs/2*cosf(-zeta) + (P0.x + P1.x)/2;
+		y_d = dist_WPs/2*sinf(-zeta) + (P0.y + P1.y)/2;
+		chi_d = atan2f(cosf(zeta), -sinf(zeta));
 		dot_chi_d = dot_zeta;
-		kappa = 1/50.f;
+		kappa = 2/dist_WPs;
+		break;
+	// Mode 3: 1点のWP(P0)と半径rで定義されるリサージュ曲線経路(電通大マークver.)
+	case 3:
+		// s と dPdzeta から数値計算でzetaを求める
+		while (1) {
+			dPdzeta = g.TPARAM_r*(25*powf(sinf(5*g.TPARAM_dzeta*i_zeta), 2) + 36*pow(sinf(6*g.TPARAM_dzeta*i_zeta), 2));
+			s_calc += dPdzeta*g.TPARAM_dzeta;
+			if (s_calc >= s) {
+				zeta = i_zeta*g.TPARAM_dzeta;
+				break;
+			}
+			i_zeta ++;
+		}
+		dot_zeta = (zeta - zeta_prev)/dt;  // 0割りが発生し得る(起動時)
+		x_d = g.TPARAM_r*cosf(5.f*zeta) + g.TPARAM_r - P0.x;
+		y_d = g.TPARAM_r*cosf(6.f*zeta) + g.TPARAM_r - P0.y;
+		chi_d = atan2f(6.f/5.f*sinf(6.f*zeta), -sinf(5.f*zeta));
+		dot_chi_d = 30*dot_zeta*(sinf(11*zeta) - 11*sinf(zeta))/(25*cosf(10.f*zeta) + 36*cosf(12*zeta) - 61.f);
+		kappa = (15*fabsf(11.f*sinf(zeta) - sinf(11*zeta))) / (g.TPARAM_r*pow((25*powf(sinf(5*zeta), 2) + 36*powf(sinf(6*zeta), 2)), 1.5f));
 		break;
 	default:
 		zeta = 0;
@@ -1402,7 +1454,7 @@ void Plane::TLAB_generate_2D_Path(void){
 }
 
 
-/* ##### Added by Kaito Yamamoto 2021.07.11. #####
+/* ##### Added by Kaito Yamamoto 2021.08.04. #####
  * "PPG　2次元経路追従コントローラ"
  * 参考文献: 高橋裕徳さんの修論(2016), ミーティング資料2021/05/16 etc.
  * 概要: コントロールバーのサーボモータ角度 [cdeg.]を計算して返す
@@ -1478,11 +1530,20 @@ int32_t Plane::TLAB_2D_Trace_Controller(void){
 	h[3] = K2*M2;
 
 	// 制御入力 u_x の計算
-	float u_x_calc = 0;  // 計算用
+	u_x_calc = 0;  // 計算用 u_x の初期化
 	for (int i = 0; i < 3; i++) {
 		u_x_calc -= Fx[i]*X[i];
 	}
-	u_x = u_x_calc;
+	// u_x のファジィ化範囲上限 u_x_max で入力値をカット
+	if (u_x_calc > u_x_max) {
+		u_x = u_x_max;
+	}
+	else if (u_x_calc < - u_x_max) {
+		u_x = - u_x_max;
+	}
+	else {
+		u_x = u_x_calc;
+	}
 
 	// 制御入力 u_chi の計算
 	float u_chi_calc = 0;  // 計算用

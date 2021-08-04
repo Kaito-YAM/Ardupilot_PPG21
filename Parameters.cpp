@@ -1731,12 +1731,12 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(TPARAM_v_a,    "TP2D_Va",   6.9),
 
-    // @Param: TPARAM_Path_Mode
-    // @DisplayName: TPARAM_Path_Mode
+    // @Param: TPARAM_Flight_Plan
+    // @DisplayName: TPARAM_Flight_Plan
     // @Description: TLab parameter
     // @Range: 0 3
     // @User: Advanced
-    GSCALAR(TPARAM_Path_Mode,    "TP2D_PathMode",   0),
+    GSCALAR(TPARAM_Flight_Plan,    "TP2D_FlightPlan",   0),  // Changed by Kaito Yamamoto 2021.08.05.
 
     // @Param: TPARAM_Path_Origin_lat
     // @DisplayName: TPARAM_Path_Origin_lat
@@ -1898,6 +1898,23 @@ const AP_Param::Info Plane::var_info[] = {
     // @Range: 0 180
     // @User: Advanced
     GSCALAR(TPARAM_chiF_max_deg,    "TP2D_ChiFMaxDeg",   178.f),
+
+    // Added by Kaito Yamamoto 2021.08.05.
+
+    // @Param: TPARAM_r
+    // @DisplayName: TPARAM_r
+    // @Description: TLab parameter
+    // @Range: 0 255
+    // @User: Advanced
+    GSCALAR(TPARAM_r,	"TP2D_R",	100),
+
+    // @Param: TPARAM_dzeta
+    // @DisplayName: TPARAM_dzeta
+    // @Description: TLab parameter
+    // @Range: 0.00001 0.001
+    // @User: Advanced
+    GSCALAR(TPARAM_dzeta,	"TP2D_Dzeta",	0.0001),
+
 
     AP_VAREND
 };

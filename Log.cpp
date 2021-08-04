@@ -213,6 +213,7 @@ void Plane::Log_Write_Fast(void)
     Log_Write_PPG_2D_1();  // Added by Kaito Yamamoto 2021.07.21.
     Log_Write_PPG_2D_2();  // Added by Kaito Yamamoto 2021.07.21.
     Log_Write_PPG_2D_3();  // Added by Kaito Yamamoto 2021.07.21.
+    Log_Write_PPG_2D_4();  // Added by Kaito Yamamoto 2021.08.05.
 }
 
 struct PACKED log_Performance {
@@ -653,6 +654,40 @@ void Plane::Log_Write_PPG_2D_3()
     DataFlash.WriteBlock(&pkt, sizeof(pkt));
 }
 
+// Added by Kaito Yamamoto 2021.08.05.
+struct PACKED log_PPG_2D_4 {
+    LOG_PACKET_HEADER;
+    uint16_t CMD_id;
+    float u_x_calc;
+    int32_t pWPlat;
+    int32_t pWPlng;
+    int32_t nWPlat;
+    int32_t nWPlng;
+    float P0_x;
+    float P0_y;
+    float P1_x;
+    float P1_y;
+};
+
+// Added by Kaito Yamamoto 2021.08.05.
+void Plane::Log_Write_PPG_2D_4()
+{
+    struct log_PPG_2D_4 pkt = {
+            LOG_PACKET_HEADER_INIT(LOG_PPG_2D_1_MSG),
+            CMD_id		: i_now_CMD,
+            u_x_calc	: u_x_calc,
+            pWPlat		: prev_WP_loc.lat,
+            pWPlng		: prev_WP_loc.lng,
+            nWPlat		: next_WP_loc.lat,
+            nWPlng		: next_WP_loc.lng,
+            P0_x		: P0.x,
+            P0_y		: P0.y,
+            P1_x		: P1.x,
+            P1_y		: P1.y
+    };
+    DataFlash.WriteBlock(&pkt, sizeof(pkt));
+}
+
 struct PACKED log_Status {
     LOG_PACKET_HEADER;
     uint64_t time_us;
@@ -879,6 +914,9 @@ const struct LogStructure Plane::log_structure[] = {
       "P2D2", "ffffffffff", "x_d, y_d, chi_d, dchi_d, kappa, u_x, u_chi, xF, yF, chiF" },
     { LOG_PPG_2D_3_MSG, sizeof(log_PPG_2D_3),
       "P2D3", "fffffffffi", "ds, K1, K2, M1, M2, h1, h2, h3, h4, d_angle" },
+    // Added by Kaito Yamamoto 2021.08.05.
+    { LOG_PPG_2D_4_MSG, sizeof(log_PPG_2D_4),
+      "P2D4", "Hfiiiiffff", "CMDid, ux_cal, pWPlt, pWPlg, nWPlt, nWPlg, P0x, P0y, P1x, P1y" },
 };
 
 #if CLI_ENABLED == ENABLED

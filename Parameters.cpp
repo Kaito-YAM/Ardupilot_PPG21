@@ -1722,7 +1722,14 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: TLAB
     GSCALAR(TPARAM_LQR_f4,    "TPARAM_LQR_f4",   0.0075),
 
-    // Added by Kaito Yamamoto 2021.07.12.
+    // @Param: TPARAM_c_alt
+    // @DisplayName: TPARAM_c_alt
+    // @Description: switching controller alt
+    // @Range: 0 100
+    // @User: TLAB
+    GSCALAR(TPARAM_c_alt,    "TPARAM_c_alt",   0),
+
+    // Added by Kaito Yamamoto 2021.07.12.------------------
 
     // @Param: TPARAM_v_a
     // @DisplayName: TPARAM_v_a
@@ -1906,7 +1913,7 @@ const AP_Param::Info Plane::var_info[] = {
     // @Description: TLab parameter
     // @Range: 0 255
     // @User: Advanced
-    GSCALAR(TPARAM_r,	"TP2D_R",	100),
+    GSCALAR(TPARAM_r,	"TP2D_R",	50),
 
     // @Param: TPARAM_dzeta
     // @DisplayName: TPARAM_dzeta
@@ -1915,6 +1922,19 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(TPARAM_dzeta,	"TP2D_Dzeta",	0.0001),
 
+    // @Param: TPARAM_k_prop_const
+    // @DisplayName: TPARAM_k_prop_const
+    // @Description: TLab parameter
+    // @Range: 1.0 3.0
+    // @User: Advanced
+    GSCALAR(TPARAM_k_prop_const,	"TP2D_k",	2.6875),  // Added by Kaito Yamamoto 2021.08.06.
+
+    // @Param: TPARAM_Bar_Control_Mode
+    // @DisplayName: TPARAM_Bar_Control_Mode
+    // @Description: TLab parameter
+    // @Range: 0 2
+    // @User: Advanced
+    GSCALAR(TPARAM_Bar_Control_Mode, "TP2D_BarMode", 0),  // Added by Kaito Yamamoto 2021.08.15.
 
     AP_VAREND
 };

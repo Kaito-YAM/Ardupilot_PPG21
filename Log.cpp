@@ -203,12 +203,12 @@ void Plane::Log_Write_Fast(void)
     if (should_log(MASK_LOG_NTUN)){
         Log_Write_Nav_Tuning();
     }
-    //Log_Write_PPG0(); // added by iwase 17/07/28
-    //Log_Write_PPG1(); // added by iwase 17/07/28
-    //Log_Write_PPG2(); // added by iwase 17/07/28
-    //Log_Write_PPG3(); // added by iwase 17/08/04
+    Log_Write_PPG0(); // added by iwase 17/07/28
+    Log_Write_PPG1(); // added by iwase 17/07/28
+    Log_Write_PPG2(); // added by iwase 17/07/28
+    Log_Write_PPG3(); // added by iwase 17/08/04
     Log_Write_PPG4(); // added by iwase 17/08/14
-    //Log_Write_PPG5(); // added by aoki 21/03/25
+    Log_Write_PPG5(); // added by aoki 21/03/25
     Log_Write_PPG6(); // added by hatae 210414
     Log_Write_PPG_2D_1();  // Added by Kaito Yamamoto 2021.07.21.
     Log_Write_PPG_2D_2();  // Added by Kaito Yamamoto 2021.07.21.
@@ -567,13 +567,13 @@ void Plane::Log_Write_PPG6()
 // Added by Kaito Yamamoto 2021.07.21.
 struct PACKED log_PPG_2D_1 {
     LOG_PACKET_HEADER;
-    uint64_t t_now;  // 現在の時刻 [us]
-    float dt;  // サンプリング時間間隔 [s]
-    float xI;  // 慣性x座標(緯度方向) [m]
-    float yI;  // 慣性y座標(経度方向) [m]
-    float psi;  // ヨー角(機首方位角) [rad] (0 ~ 2PI)
-    float chi;  // 航路角 [rad] (0 ~ 2PI)
-    float v_g;  // 対地速度の大きさ [m/s]
+    uint64_t t_now;
+    float dt;
+    float xI;
+    float yI;
+    float psi;
+    float chi;
+    float v_g;
     float s;
     float zeta;
     float dot_zeta;
@@ -645,10 +645,10 @@ void Plane::Log_Write_PPG_2D_3()
             K2		: K2,
             M1		: M1,
             M2		: M2,
-            h1		: h[0],
-            h2		: h[1],
-            h3		: h[2],
-            h4		: h[3],
+            h1		: h_chi[0],
+            h2		: h_chi[1],
+            h3		: h_chi[2],
+            h4		: h_chi[3],
             d_angle	: d_angle
     };
     DataFlash.WriteBlock(&pkt, sizeof(pkt));
@@ -673,7 +673,7 @@ struct PACKED log_PPG_2D_4 {
 void Plane::Log_Write_PPG_2D_4()
 {
     struct log_PPG_2D_4 pkt = {
-            LOG_PACKET_HEADER_INIT(LOG_PPG_2D_1_MSG),
+            LOG_PACKET_HEADER_INIT(LOG_PPG_2D_4_MSG),
             CMD_id		: i_now_CMD,
             u_x_calc	: u_x_calc,
             pWPlat		: prev_WP_loc.lat,
@@ -869,11 +869,11 @@ const struct LogStructure Plane::log_structure[] = {
       "STRT", "QBH",         "TimeUS,SType,CTot" },
     // Commented out by Kaito Yamamoto 2021.07.23.
     /*
-    { LOG_CTUN_MSG, sizeof(log_Control_Tuning),
+    { LOG_CTUN_MSG, sizeof(log_Control_Tuning),     
       "CTUN", "Qiiiibii",    "TimeUS,nWlat,nWlng,pWlat,pWlng,cmode,clat,clng" },
     */
     // Added by Kaito Yamamoto 2021.07.23.
-    { LOG_CTUN_MSG, sizeof(log_Control_Tuning),     
+    { LOG_CTUN_MSG, sizeof(log_Control_Tuning),
       "CTUN", "Qiiiibii",    "TimeUS,pWlat,pWlng,nWlat,nWlng,cmode,clat,clng" },
 //      "CTUN", "Qiiii",    "TimeUS,nWlat,nWlng,pWlat,pWlng" },
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         

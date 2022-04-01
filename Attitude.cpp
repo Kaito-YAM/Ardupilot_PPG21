@@ -425,6 +425,7 @@ void Plane::stabilize()
 
 
 void Plane::calc_throttle()
+
 {
     // comment outed by iwase 17/07/29
 //    if (aparm.throttle_cruise <= 1) {
@@ -448,13 +449,184 @@ void Plane::calc_throttle()
 
     channel_throttle->set_servo_out(commanded_throttle);
 }
+/*
+void max_min_z(float max_z1, float min_z1, float max_z2, float min_z2, float max_z3, float min_z3, int num){
+	if (num==1){
+    	//dz_d -1.5 to 1.5(m/s)
+    	//theta -10 to 10(deg.)
+		max_z1=-0.19956;
+		min_z1=-0.80692;
+		max_z2=13.9932;
+		min_z2=10.2479;
+		max_z3=0.31838;
+		min_z3=0.073926;
+	} else if (num==2){
+    	//dz_d -1.5 to 1.5(m/s)
+    	//theta -10 to 10(deg.)
+		max_z1=-0.19956;
+		min_z1=-0.80692;
+		max_z2=13.9932;
+		min_z2=10.2479;
+		max_z3=0.31838;
+		min_z3=0.073926;
+	} else if(num==3){
+    	//dz_d -1.5 to 1.5(m/s)
+    	//theta -5 to 5(deg.)
+		max_z1=-0.19956;
+		min_z1=-0.80692;
+		max_z2=13.2529;
+		min_z2=11.1097;
+		max_z3=0.25977;
+		min_z3=0.13707;
+	} else {
+    	//dz_d -1.5 to 1.5(m/s)
+    	//theta -5 to 5(deg.)
+		max_z1=-0.19956;
+		min_z1=-0.80692;
+		max_z2=13.2529;
+		min_z2=11.1097;
+		max_z3=0.25977;
+		min_z3=0.13707;
+	}
+}
+*/
+
+void switch_controller_alt(int number_controller_alt, float f[8][4], float z[3][2]){
+	//switching the feedback gain designed by LMI, added by hatae 2021/7/28
+	if (number_controller_alt==1){
+    	//dz_d -1.5 to 1.5(m/s)
+    	//theta -10 to 10(deg.)
+    	//alpha 0.01
+    	//x(0)=[2;1;0;0]
+    	//mu=6.5
+        float F[8][4]={
+        	{0.24887,3.8117,-0.014127,0.24208},
+        	{0.2156,3.5863,-0.036707,0.20848},
+        	{0.20803,4.1414,-0.0020214,0.21848},
+        	{0.17783,3.8637,-0.026582,0.17963},
+        	{0.16185,4.549,0.015949,0.164},
+        	{0.15125,3.97,-0.019482,0.15579},
+        	{0.10078,4.7296,0.047139,0.19323},
+        	{0.1166,4.0331,-0.0075814,0.13821}
+        };
+        float Z[3][2]={
+        	{-0.19956,-0.80692},
+        	{13.9932,10.2479},
+        	{0.31838,0.073926}
+        };
+        for (int i=0;i<8;i++){
+        	for (int j=0;j<4;j++){
+        		f[i][j]=F[i][j];
+        	}
+        }
+        for (int i=0;i<3;i++){
+        	for (int j=0;j<2;j++){
+        		z[i][j]=Z[i][j];
+        	}
+        }
+    } else if(number_controller_alt==2){
+    	//dz_d -1.5 to 1.5(m/s)
+    	//theta -10 to 10(deg.)
+    	//alpha 0.1
+    	//x(0)=[2;1.5;0;0]
+    	//mu=12
+        float F[8][4]={
+        	{0.99609,4.3079,0.085038,0.29888},
+        	{0.82427,4.8389,0.056465,0.26573},
+        	{0.93049,5.3483,0.087198,0.29675},
+        	{0.7685,5.1532,0.056999,0.25737},
+        	{0.78918,6.2386,0.089284,0.26875},
+        	{0.63431,5.6553,0.054239,0.22551},
+        	{0.60786,6.5665,0.10033,0.24711},
+        	{0.54911,5.8333,0.05316,0.21386}
+        };
+        float Z[3][2]={
+        	{-0.19956,-0.80692},
+        	{13.9932,10.2479},
+        	{0.31838,0.073926}
+        };
+        for (int i=0;i<8;i++){
+          for (int j=0;j<4;j++){
+            f[i][j]=F[i][j];
+          }
+        }
+        for (int i=0;i<3;i++){
+        	for (int j=0;j<2;j++){
+        		z[i][j]=Z[i][j];
+        	}
+        }
+    } else if(number_controller_alt==3){
+    	//dz_d -1.5 to 1.5(m/s)
+    	//theta -5 to 5(deg.)
+    	//alpha 0.2
+    	//x(0)=[3;1.5;0;0]
+    	//mu=12
+        float F[8][4]={
+        	{1.1101,2.7506,0.062397,0.22145},
+        	{1.1221,3.1775,0.057379,0.22023},
+        	{1.1661,3.7206,0.065712,0.23362},
+        	{1.1288,3.8152,0.058197,0.22173},
+        	{0.92763,4.9578,0.057638,0.19507},
+        	{0.88139,4.6416,0.049835,0.1845},
+        	{0.78222,4.9678,0.056559,0.1849},
+        	{0.79436,4.6206,0.047368,0.17421}
+        };
+        float Z[3][2]={
+        	{-0.19956,-0.80692},
+        	{13.2529,11.1097},
+        	{0.25977,0.13707}
+        };
+        for (int i=0;i<8;i++){
+          for (int j=0;j<4;j++){
+            f[i][j]=F[i][j];
+          }
+        }
+        for (int i=0;i<3;i++){
+        	for (int j=0;j<2;j++){
+        		z[i][j]=Z[i][j];
+        	}
+        }
+    } else {
+    	//dz_d -1.5 to 1.5(m/s)
+    	//theta -5 to 5(deg.)
+    	//alpha 0.01
+    	//x(0)=[2;1;0;0]
+    	//mu=6.5
+        float F[8][4]={
+        	{0.39106,2.2661,-0.25992,0.16117},
+        	{0.35661,2.1644,-0.29158,0.15248},
+        	{0.31853,2.5284,-0.1838,0.16855},
+        	{0.27446,2.4481,-0.20659,0.14603},
+        	{0.27142,2.8615,-0.080487,0.077737},
+        	{0.26178,2.6207,-0.20091,0.10142},
+        	{0.23188,2.9284,-0.065439,0.18728},
+        	{0.19221,2.7164,-0.11955,0.13071}
+        };
+        float Z[3][2]={
+        	{-0.19956,-0.80692},
+        	{13.2529,11.1097},
+        	{0.25977,0.13707}
+        };
+        for (int i=0;i<8;i++){
+          for (int j=0;j<4;j++){
+            f[i][j]=F[i][j];
+          }
+        }
+        for (int i=0;i<3;i++){
+        	for (int j=0;j<2;j++){
+        		z[i][j]=Z[i][j];
+        	}
+        }
+    }
+}
+
 
 int32_t Plane::TLAB_Throttle_Controller(void)
 {
     float h_Th[2];
     int32_t z_cm = current_loc.alt;
     int32_t z_r_cm = next_WP_loc.alt;
-    z = z_cm * 0.01f;
+    z = z_cm * 0.01f;  // POS高度 [m]
     z_r= z_r_cm * 0.01f;
     uint64_t current_time_Th =  AP_HAL::micros64();
 
@@ -504,15 +676,15 @@ int32_t Plane::TLAB_Throttle_Controller(void)
             int32_t dz_int = z_cm - z_old;
             dz_f = (float)dz_int;
             d_pitch = ahrs.pitch - pitch_old;
-            dz = dz_f*0.01/(past_time_Th_f);
+            dz = dz_f*0.01/(past_time_Th_f);  // 高度の時間微分 [m/s]
             speed_pitch = d_pitch/(past_time_Th_f);
             z_old = z_cm;
             pitch_old = ahrs.pitch;
             prev_time_Th = current_time_Th;
         }
     //
-    e_m = z-z_r;
-    de_m = dz;
+    e_m = z - z_r;  // 高度の制御偏差 [m]
+    de_m = dz;  // 高度の時間微分 [m/s]
     h_Th[0] = constrain_float((de_m - d2_Th)/(d1_Th - d2_Th),0.0f,1.0f);
     h_Th[1] = constrain_float((d1_Th - de_m)/(d1_Th - d2_Th),0.0f,1.0f);
     gps_dh = -gps.velocity().z;//add by aoki
@@ -538,159 +710,64 @@ int32_t Plane::TLAB_Throttle_Controller(void)
     }else if(g.TPARAM_cha_pow == 3){
     	//PD Controller
         motor_Th_N = motor_neutral;
-        motor_Th_N +=-(kp_Th[0]*e_m+kd_Th[0]*de_m);
+        motor_Th_N +=-(kp_Th[0]*e_m + kd_Th[0]*de_m);
     }else if(g.TPARAM_cha_pow == 4){
-    	//LQR Controller
-    	/*
-    	float pitch_neutral=15.3381*M_PI/180;
-    	float f_1=g.TPARAM_LQR_f1;
-    	float f_2=g.TPARAM_LQR_f2;
-    	float f_3=g.TPARAM_LQR_f3;
-    	float f_4=g.TPARAM_LQR_f4;
-
-    	motor_Th_N = -(f_1*e_m+f_2*gps_dh+f_3*(ahrs.pitch-pitch_neutral)+f_4*speed_pitch);
-    	motor_Th_N += motor_neutral;
-    	*/
-    	motor_Th_N = motor_neutral;
+    	//LQR Controller, but not done yet, added by hatae
+    	motor_Th_N = 0;
     }else if(g.TPARAM_cha_pow == 5){
-    	//KI Controller
-    	/*
-    	float R=g.TPARAM_R_KI;
-        float M=1.700*pow(10,-1);
-        float m=1.197;
-        float C_L=4.660*pow(10,-1);
-        float rho=1.293;
-        float S=9.424*pow(10,-1);
-        float C_D=1.640*pow(10,-1);
-        float V_xn=6.5598;
-        float I_b=6.900*pow(10,-3);
-        float gamma=5*M_PI/180;
-        float theta_n=15.3396*M_PI/180;
-        float l=8.358*pow(10,-1);
+    	//KI Controller, but not done yet, added by hatae
+    	motor_Th_N = 0;
+    }else if(g.TPARAM_cha_pow == 6){
+    	//LMI controller, added by hatae 2021/7/28
+    	//定数
+    	float c_m_1=1.700f*pow(10.0f,-1.0f); //small m
+    	float c_m_2=1.197f;
+    	float c_C_L=4.660f*pow(10.0f,-1.0f);
+    	float c_C_D=1.640f*pow(10.0f,-1.0f);
+    	float c_rho=1.293f;
+    	float c_l=9.59f*pow(10.0f,-1.0f);
+    	float c_l_g=1.36f*pow(10.0f,-1.0f);
+    	float c_S=9.424f*pow(10.0f,-1.0f);
+    	float c_I_y=1.37f*pow(10.0f,-1.0f);
+    	float c_alpha=4.36f/180.0f*M_PI;
+    	float c_L=c_rho*c_C_L*c_S;
+    	float c_D=c_rho*c_C_D*c_S;
 
-        float sum_m=(M+m);
-        float L=1/2*C_L*rho*S;
-        float D=1/2*C_D*rho*S;
-        float theta_r=ahrs.pitch-theta_n;
-        float thg=theta_n+gamma;
-        float dvtd=pow(gps_dh,2)/V_xn-theta_r*gps_dh;
-
-        float max_z1=1.0126;
-        float min_z1=-1.8265;
-        float max_z2=0.3864;
-        float min_z2=-2.7093*pow(10,-4);
-        float max_z3=0.5236;
-        float min_z3=-0.5236;
-
-        float z1=(L*gps_dh)/(sum_m)-(D*pow(gps_dh,2))/((sum_m)*V_xn);
-        float z2=l*gps_dh*(D*cos(thg)-L*sin(thg))/I_b+l*(D*dvtd*sin(thg)-L*(-dvtd)*cos(thg))/I_b;
-        float z3=theta_r;
-
-        float mem_M[2];
-        float mem_N[2];
-        float mem_L[2];
-        float h[8];
-
-        mem_M[0]=(max_z1-z1)/(max_z1-min_z1);
-        mem_M[1]=(z1-min_z1)/(max_z1-min_z1);
-        mem_N[0]=(max_z2-z2)/(max_z2-min_z2);
-        mem_N[1]=(z2-min_z2)/(max_z2-min_z2);
-        mem_L[0]=(max_z3-z3)/(max_z3-min_z3);
-        mem_L[1]=(z3-min_z3)/(max_z3-min_z3);
-
-        h[0]=constrain_float(mem_M[0]*mem_N[0]*mem_L[0], 0.0f, 1.0f);
-        h[1]=constrain_float(mem_M[0]*mem_N[0]*mem_L[1], 0.0f, 1.0f);
-        h[2]=constrain_float(mem_M[0]*mem_N[1]*mem_L[0], 0.0f, 1.0f);
-        h[3]=constrain_float(mem_M[0]*mem_N[1]*mem_L[1], 0.0f, 1.0f);
-        h[4]=constrain_float(mem_M[1]*mem_N[0]*mem_L[0], 0.0f, 1.0f);
-        h[5]=constrain_float(mem_M[1]*mem_N[0]*mem_L[1], 0.0f, 1.0f);
-        h[6]=constrain_float(mem_M[1]*mem_N[1]*mem_L[0], 0.0f, 1.0f);
-        h[7]=constrain_float(mem_M[1]*mem_N[1]*mem_L[1], 0.0f, 1.0f);
-
-        //ログ用(一時的に使用)
-        h_0=h[0];
-        h_1=h[1];
-        h_2=h[2];
-        h_3=h[3];
-        h_4=h[4];
-        h_5=h[5];
-        h_6=h[6];
-        h_7=h[7];
-
-        float B[4][8]={
-            {0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000},
-            {0.56290,-0.17586,0.56290,-0.17586,0.56290,-0.17586,0.56290,-0.17586},
-            {0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000,0.00000},
-            {2.58087,2.58087,2.58087,2.58087,2.58087,2.58087,2.58087,2.58087},
-        };
-
-        float rVrx[4];
-        rVrx[0]=6.2972*theta_r+2.0f*4.8016*e_m+0.049207*speed_pitch+12.4038*gps_dh;
-        rVrx[1]=-315.8458*theta_r+12.4038*e_m+0.056611*speed_pitch+2.0f*41.9198*gps_dh;
-        rVrx[2]=2.0f*1317.8263*theta_r+6.2972*e_m+1.8125*speed_pitch-315.8458*gps_dh;
-        rVrx[3]=1.8125*theta_r+0.049207*e_m+2.0f*0.71174*speed_pitch+0.056611*gps_dh;
-
-        motor_Th_N=motor_neutral;
-        for (int i=0; i < 8; i++){
-            float BV=0;
-            for (int j = 0; j < 4; j++){
-                BV += B[j][i]*rVrx[j];
-            }
-
-            motor_Th_N += -1.0f/2.0f*R*h[i]*BV;
-        }
-        */
-    	motor_Th_N = motor_neutral;
-
-
-    }
-    // Commented out by Kaito Yamamoto 2021.07.20.
-    /*else if(g.TPARAM_cha_pow == 6){
+    	//コントローラ選択(フィードバックゲイン)
+    	int num=g.TPARAM_c_alt;
     	//最大値最小値設定
-        float max_z1=1.5;
-        float min_z1=-1.5;
-        float max_z2=10.0/180.0*M_PI;
-        float min_z2=-10.0/180.0*M_PI;
-        float max_z3=80.0/180.0*M_PI;
-        float min_z3=-80.0/180.0*M_PI;
+        float maxmin_z[3][2];
+        //フィードバックゲイン指定
+        float f[8][4];
+        switch_controller_alt(num,f,maxmin_z);
         //平衡点周りの変数
-        float theta_n=15.8/180.0*M_PI;
-        float T_neutral=4.46;
+        float theta_n=15.8f/180.0f*M_PI;
+        float T_neutral=4.46f;
         float theta_r=ahrs.pitch-theta_n;
+        float v_xn=6.55;
         //z1からz3の設定
-        float z1=gps_dh;
-        float z2=theta_r;
-        float z3=gps_dpitch;
+        float z1=(1.0f/2.0f*c_L*gps_dh*cos(atan(gps_dh/v_xn))-1.0f/2.0f*c_D*gps_dh*sin(atan(gps_dh/v_xn))-1.0f/2.0f*c_D*v_xn)/(c_m_1+c_m_2);
+        float z2=(-1.0f/2.0f*(c_l-c_l_g)*c_L*gps_dpitch*sin(theta_r+theta_n+alpha-atan(gps_dh/v_xn))+1.0f/2.0f*(c_l-c_l_g)*c_l*v_xn*cos(theta_r)*cos(theta_n+alpha)+1.0f/2.0f*(c_l-c_l_g)*c_D*gps_dh*cos(theta_r+theta_n+alpha-atan(gps_dh/v_xn))+1.0f/2.0f*(c_l-c_l_g)*c_D*v_xn*cos(theta_r)*sin(theta_n+alpha)-1.0f/2.0f*(c_l-c_l_g)*c_L*v_xn*sin(theta_r)*sin(theta_n+alpha)-1.0f/2.0f*(c_l-c_l_g)*c_D*v_xn*sin(theta_r)*cos(theta_n+alpha))/c_I_y;
+        float z3=sin(theta_r+theta_n)/(c_m_1+c_m_2);
         //メンバシップ関数指定
         float mem_M[2];
         float mem_N[2];
         float mem_L[2];
         float h[8];
         //メンバシップ関数
-        mem_M[0]=(max_z1-z1)/(max_z1-min_z1);
-        mem_M[1]=(z1-min_z1)/(max_z1-min_z1);
-        mem_N[0]=(max_z2-z2)/(max_z2-min_z2);
-        mem_N[1]=(z2-min_z2)/(max_z2-min_z2);
-        mem_L[0]=(max_z3-z3)/(max_z3-min_z3);
-        mem_L[1]=(z3-min_z3)/(max_z3-min_z3);
-        //メンバシップ関数を0to1に限定
-        if (mem_M[0]>1){
-        	mem_M[0]=1;
-        	mem_M[1]=0;
-        } else if(mem_N[0]>1){
-        	mem_N[0]=1;
-        	mem_N[1]=0;
-        } else if(mem_L[0]>1){
-        	mem_L[0]=1;
-        	mem_L[1]=0;
-        }
+        mem_M[0]=constrain_float((maxmin_z[0][0]-z1)/(maxmin_z[0][0]-maxmin_z[0][1]),0.0f,1.0f);
+        mem_M[1]=constrain_float((z1-maxmin_z[0][1])/(maxmin_z[0][0]-maxmin_z[0][1]),0.0f,1.0f);
+        mem_N[0]=constrain_float((maxmin_z[1][0]-z2)/(maxmin_z[1][0]-maxmin_z[1][1]),0.0f,1.0f);
+        mem_N[1]=constrain_float((z2-maxmin_z[1][1])/(maxmin_z[1][0]-maxmin_z[1][1]),0.0f,1.0f);
+        mem_L[0]=constrain_float((maxmin_z[2][0]-z3)/(maxmin_z[2][0]-maxmin_z[2][1]),0.0f,1.0f);
+        mem_L[1]=constrain_float((z3-maxmin_z[2][1])/(maxmin_z[2][0]-maxmin_z[2][1]),0.0f,1.0f);
         //メンバシップ関数計算
-        int num=0;
+        int num_loop=0;
         for (int i=0;i<2;i++){
           for (int j=0;j<2;j++){
             for (int k=0;k<2;k++){
-              h[num]=mem_M[i]*mem_N[j]*mem_L[k];
-              num+=1;
+              h[num_loop]=mem_M[i]*mem_N[j]*mem_L[k];
+              num_loop+=1;
             }
           }
         }
@@ -703,17 +780,6 @@ int32_t Plane::TLAB_Throttle_Controller(void)
         h_5=h[5];
         h_6=h[6];
         h_7=h[7];
-        //フィードバックゲイン指定
-        float f[8][4]={
-        	{0.4116,3.3118,-0.31973,-0.035216},
-            {0.41501,3.0882,-0.10037,-0.5691},
-            {0.43631,3.6213,0.4003,-0.098882},
-            {0.44233,3.6122,0.52481,-0.15383},
-            {0.17158,1.225,-0.42208,2.38},
-            {0.42134,2.7431,-0.783,1.2238},
-            {0.44752,3.2037,-0.59069,1.196},
-            {0.49748,3.2449,-0.6896,0.80952}
-        };
         float x_r[4]={e_m,gps_dh,theta_r,gps_dpitch};
         //推力計算
         motor_Th_N=T_neutral;
@@ -726,7 +792,6 @@ int32_t Plane::TLAB_Throttle_Controller(void)
         	motor_Th_N+=-h[i]*motor_Th_N_i;
         }
     }
-    */
     //↓motor_Th_Nがスピコン変換用のプログラムを通して%出力になる
     motor_per = thrust_to_percent(motor_Th_N);
     return static_cast<int32_t>(motor_per);
@@ -769,7 +834,7 @@ float Plane::thrust_to_percent(float thrust) {
                      }else{
                          value2=value1;
                      }
-            power15 = kk*(a*pow(15,2)+c);
+            //power15 = kk*(a*pow(15,2)+c);
             if (thrust < 0.3256)
                 return 0;
            else {
@@ -829,8 +894,20 @@ void Plane::calc_nav_yaw_coordinated(float speed_scaler)
     }
     */
 
-    // Added by Kaito Yamamoto 2021.07.12.
-    steering_control.rudder = constrain_int16(TLAB_2D_Trace_Controller(), -4500, 4500);
+    // Added by Kaito Yamamoto 2021.08.11.
+    if (g.TPARAM_Bar_Control_Mode == 1) {
+    	// 過去の直線追従コントローラ  "g.TPARAM_switch_mo" でコントローラ切り替え
+    	steering_control.rudder = constrain_int16(TLAB_Line_Trace_Controller(), -4500, 4500);
+    }
+    else if (g.TPARAM_Bar_Control_Mode == 2) {
+    	// MPで指定する "g.TPARAM_s_neutral" [deg]の一定値をサーボモーター角度として出力する
+    	steering_control.rudder = constrain_int16(TLAB_Constant_Output(), -4500, 4500);
+    }
+    else {
+        // Added by Kaito Yamamoto 2021.07.12.
+        //多様な2次元経路追従コントローラ
+       	steering_control.rudder = constrain_int16(TLAB_2D_Trace_Controller(), -4500, 4500);
+    }
 }
 
 void Plane::init_TLAB_Controller(void)
@@ -1108,7 +1185,6 @@ int32_t Plane::TLAB_Line_Trace_Controller()
     servo = static_cast<int32_t>(asinf(constrain_float(58.0f / 29.0f * sinf(u), -1.0f, 1.0f))*100.0f*180.0f/M_PI);
     return servo;
 }
-
 int32_t Plane::TLAB_Circle_Trace_Controller(void)
 {
     arg_r = get_distance(Target_Circle_Center,current_loc);
@@ -1296,19 +1372,33 @@ int32_t Plane::TLAB_Combine_Controller(void)
     }
 }
 
+
+/* ##### Added by Kaito Yamamoto 2021.08.11. #####
+ * 概要: 一定のサーボモーター角度を出力する
+*/
+int32_t Plane::TLAB_Constant_Output(void){
+	// 変数の初期設定
+	if (!yet_init) {
+		servo = 0;
+		yet_init = true;
+	}
+	servo = static_cast<int32_t>(g.TPARAM_servo_neutral*100);  // [cdeg]
+	return servo;
+}
+
+
 /* ##### Added by Kaito Yamamoto 2021.08.04. #####
  * 概要: Plane::TLAB_2D_Trace_Controller(void)内の変数の初期化
 */
 void Plane::init_TLAB_2D_Trace_Controller(void){
 	// UAVに固有な定数
 	v_a = g.TPARAM_v_a;  // 対気速度の大きさ [m/s]: const
-	k = g.TPARAM_k;  // コントロールバー角度 [rad]と旋回速度 [rad/s]の比例定数 [1/s]
-	// 目標経路の選択
-	//Path_Origin.lat = g.TPARAM_Path_Origin_lat;  // 目標経路の原点位置の設定(int32_t): 緯度 [1e-7*deg]
-    //Path_Origin.lng = g.TPARAM_Path_Origin_lng;  // 目標経路の原点位置の設定(int32_t): 経度 [1e-7*deg]
-    Path_Origin.lat = prev_WP_loc.lat;  // 目標経路の原点位置の設定(int32_t): 緯度 [1e-7*deg]
-    Path_Origin.lng = prev_WP_loc.lng;  // 目標経路の原点位置の設定(int32_t): 経度 [1e-7*deg]
-    Flight_Plan = g.TPARAM_Flight_Plan;  // フライトプランの設定
+	k_prop_const = g.TPARAM_k_prop_const;  // コントロールバー角度 [rad]と旋回速度 [rad/s]の比例定数(proportional constant) [1/s]
+	// xy座標の原点位置をHP(オートモード開始地点)に設定(int32_t): 緯度,経度 [1e-7*deg]
+    Path_Origin.lat = prev_WP_loc.lat;
+    Path_Origin.lng = prev_WP_loc.lng;
+    // フライトプランの設定
+    Flight_Plan = g.TPARAM_Flight_Plan;
 	// フィードバックゲイン  Fx[3], Fchi[4][3]
 	Fx[0] = g.TPARAM_Fx1;
 	Fx[1] = g.TPARAM_Fx2;
@@ -1359,25 +1449,38 @@ void Plane::TLAB_generate_2D_Path(void){
 	i_now_CMD = TLAB_CMD_index;  // CMDインデックスの更新
 	float zeta_prev = zeta;
 
+	// Commented out 2021.08.26.
+	/*
 	if (s < 0) {
 		s = 0;
 	}
+	*/
 
+	float Px, Py;  // 構造体 Vector2f のx, yを置換するために使用する
+	Location WP0;  // 目標経路の初期位置を設定するためのローカル変数
 	// フライトプランを指定する
 	switch (Flight_Plan) {
-	// Mode 0: HP -(直線)-> WP1 -(直線)-> WP2 -...
+	// Mode 0: HP -(直線)-> WP1, WP0 -(直線)-> WP2 -...
 	// 指定WP -- N個 (何個でも指定可能.ただし,HPはAUTOモードに切り替えた地点が割り当てられる.)
 	case 0:
 		Path_Mode = 0;
 		// AUTOモードに切り替わり,WPがセットされたとき
-		if (zeta < 0.5 && i_now_CMD != i_prev_CMD) {
+		if (zeta < 0.1 && i_now_CMD != i_prev_CMD) {
 			// 直線経路を更新(初回なので定義)する
 			dist_WPs = get_distance(prev_WP_loc, next_WP_loc);  // 2つのWP間の距離 [m]を更新
-			P0 = location_diff(Path_Origin, prev_WP_loc);  // P0を更新: 目標経路中心からの変位(N.E <-> x,y) [m]
-			P1 = location_diff(Path_Origin, next_WP_loc);  // P1を更新: 目標経路中心からの変位(N.E <-> x,y) [m]
+			P0 = location_diff(Path_Origin, prev_WP_loc);  // P0を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+			Px = P0.y;
+			Py = P0.x;
+			P0.x = Px;
+			P0.y = Py;
+			P1 = location_diff(Path_Origin, next_WP_loc);  // P1を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+			Px = P1.y;
+			Py = P1.x;
+			P1.x = Px;
+			P1.y = Py;
 		}
 		// WP半径内に到達し,WPが新たにセットされたとき
-		else if (zeta >= 0.5 && i_now_CMD != i_prev_CMD) {
+		else if (zeta >= 0.1 && i_now_CMD != i_prev_CMD) {
 			// 次に媒介変数zetaが1に達したときに,P0
 			change_path_flag = true;
 		}
@@ -1388,12 +1491,322 @@ void Plane::TLAB_generate_2D_Path(void){
 			zeta = 0;
 			change_path_flag = false;
 			// 直線経路の更新
-			dist_WPs = get_distance(prev_WP_loc, next_WP_loc);  // 2つのWP間の距離 [m]を更新
-			P0 = location_diff(Path_Origin, prev_WP_loc);  // P0を更新: 目標経路中心からの変位(N.E <-> x,y) [m]
-			P1 = location_diff(Path_Origin, next_WP_loc);  // P1を更新: 目標経路中心からの変位(N.E <-> x,y) [m]
+			if (i_now_CMD == 2) {
+				// 検証用 目標経路の初期位置 緯度・経度の設定
+				WP0.lat = g.TPARAM_Path_Origin_lat;  // 目標経路の初期位置(WP0) 緯度 [1e-7*deg]
+				WP0.lng = g.TPARAM_Path_Origin_lng;  // 目標経路の初期位置(WP0) 経度 [1e-7*deg]
+				dist_WPs = get_distance(WP0, next_WP_loc);  // 2つのWP間の距離 [m]を更新
+				P0 = location_diff(Path_Origin, WP0);  // P0をMPで設定した位置にセット: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P0.y;
+				Py = P0.x;
+				P0.x = Px;
+				P0.y = Py;
+			}
+			else {
+				dist_WPs = get_distance(prev_WP_loc, next_WP_loc);  // 2つのWP間の距離 [m]を更新
+				P0 = location_diff(Path_Origin, prev_WP_loc);  // P0を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P0.y;
+				Py = P0.x;
+				P0.x = Px;
+				P0.y = Py;
+			}
+			P1 = location_diff(Path_Origin, next_WP_loc);  // P1を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+			Px = P1.y;
+			Py = P1.x;
+			P1.x = Px;
+			P1.y = Py;
 		}
 		break;
-	}
+	// Mode 1: WP0 -(直線)-> WP1 -(円経路・右旋回)-> WP2
+	// 指定WP -- N個 (何個でも指定可能.ただし,HPはAUTOモードに切り替えた地点が割り当てられる.)
+	case 1:
+		if (Path_Mode == 0) {
+			// AUTOモードに切り替わり,WPがセットされたとき
+			if (zeta < 0.1 && i_now_CMD != i_prev_CMD) {
+				Path_Mode = 0;  // 直線経路モードにセット
+				// 直線経路を更新(初回なので定義)する
+				// 目標経路の初期位置 緯度・経度の設定
+				WP0.lat = g.TPARAM_Path_Origin_lat;  // 目標経路の初期位置(WP0) 緯度 [1e-7*deg]
+				WP0.lng = g.TPARAM_Path_Origin_lng;  // 目標経路の初期位置(WP0) 経度 [1e-7*deg]
+				dist_WPs = get_distance(WP0, next_WP_loc);  // 2つのWP間の距離 [m]を更新
+				P0 = location_diff(Path_Origin, WP0);  // P0をMPで設定した位置にセット: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P0.y;
+				Py = P0.x;
+				P0.x = Px;
+				P0.y = Py;
+				//P0 = location_diff(Path_Origin, prev_WP_loc);  // P0を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				//Px = P0.y;
+				//Py = P0.x;
+				//P0.x = Px;
+				//P0.y = Py;
+				P1 = location_diff(Path_Origin, next_WP_loc);  // P1を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P1.y;
+				Py = P1.x;
+				P1.x = Px;
+				P1.y = Py;
+			}
+			// WP半径内に到達し,WPが新たにセットされたとき
+			else if (zeta >= 0.1 && i_now_CMD != i_prev_CMD) {
+				// 次に媒介変数zetaが1に達したときに,P0
+				change_path_flag = true;
+			}
+			// WP半径内に到達したあとで,zetaが1に到達したとき
+			if (change_path_flag == true && zeta >= 1) {
+				// 目標経路の切り替え: s, zeta の初期化
+				s = 0;
+				zeta_prev = 0;  // zeta 初期化の瞬間に dot_zetaが大きくなるのを防ぐため
+				change_path_flag = false;
+				// P0, P1の更新
+				dist_WPs = get_distance(prev_WP_loc, next_WP_loc);  // 2つのWP間の距離 [m]を更新 ---使わない
+				P0 = location_diff(Path_Origin, prev_WP_loc);  // P0を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P0.y;
+				Py = P0.x;
+				P0.x = Px;
+				P0.y = Py;
+				P1 = location_diff(Path_Origin, next_WP_loc);  // P1を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P1.y;
+				Py = P1.x;
+				P1.x = Px;
+				P1.y = Py;
+				Path_Mode = 5;  // 円経路 右旋回モードにセット
+			}
+		}
+
+		if (Path_Mode == 5) {
+			// do nothing
+			// 経路の切り替えはしない  -> 円経路を旋回し続ける
+		}
+		break;
+	// Mode 2: HP -(直線)-> WP1 -(直線)-> WP2 -> -(リサージュ曲線 8の字 2周) -> WP3 -(直線)-> WP4 ...
+	// 指定WP -- N個 (何個でも指定可能.ただし,HPはAUTOモードに切り替えた地点が割り当てられる.)
+	case 2:
+		if (Path_Mode == 0) {
+			// AUTOモードに切り替わり,WPがセットされたとき
+			if (zeta < 0.1 && i_now_CMD != i_prev_CMD) {
+				// 直線経路を更新(初回なので定義)する
+				// 目標経路の初期位置 緯度・経度の設定
+				//WP0.lat = g.TPARAM_Path_Origin_lat;  // 目標経路の初期位置(WP0) 緯度 [1e-7*deg]
+				//WP0.lng = g.TPARAM_Path_Origin_lng;  // 目標経路の初期位置(WP0) 経度 [1e-7*deg]
+				//dist_WPs = get_distance(WP0, next_WP_loc);  // 2つのWP間の距離 [m]を更新
+				//P0 = location_diff(Path_Origin, WP0);  // P0をMPで設定した位置にセット: 目標経路中心からの変位(N.E <-> y,x) [m]
+				//Px = P0.y;
+				//Py = P0.x;
+				//P0.x = Px;
+				//P0.y = Py;
+				dist_WPs = get_distance(prev_WP_loc, next_WP_loc);  // 2つのWP間の距離 [m]を更新
+				P0 = location_diff(Path_Origin, prev_WP_loc);  // P0を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P0.y;
+				Py = P0.x;
+				P0.x = Px;
+				P0.y = Py;
+				P1 = location_diff(Path_Origin, next_WP_loc);  // P1を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P1.y;
+				Py = P1.x;
+				P1.x = Px;
+				P1.y = Py;
+			}
+			// WP半径内に到達し,WPが新たにセットされたとき
+			else if (zeta >= 0.1 && i_now_CMD != i_prev_CMD) {
+				// 次に媒介変数zetaが1に達したときに,P0
+				change_path_flag = true;
+			}
+			// WP半径内に到達したあとで,zetaが1に到達したとき
+			if (change_path_flag == true && zeta >= 1) {
+				// 目標経路の切り替え: s, zeta の初期化
+				s = 0;
+				zeta_prev = 0;  // zeta 初期化の瞬間に dot_zetaが大きくなるのを防ぐため
+				change_path_flag = false;
+				// P0, P1の更新
+				dist_WPs = get_distance(prev_WP_loc, next_WP_loc);  // 2つのWP間の距離 [m]を更新 ---使わない
+				P0 = location_diff(Path_Origin, prev_WP_loc);  // P0を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P0.y;
+				Py = P0.x;
+				P0.x = Px;
+				P0.y = Py;
+				P1 = location_diff(Path_Origin, next_WP_loc);  // P1を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P1.y;
+				Py = P1.x;
+				P1.x = Px;
+				P1.y = Py;
+				if (i_now_CMD == 3) {
+					Path_Mode = 6;  // リサージュ曲線（8の字）経路モードにセット
+				}
+			}
+		}
+		if (Path_Mode == 6) {
+			// WP半径内に到達し,WPが新たにセットされたとき
+			if (zeta >= 0.1 && i_now_CMD != i_prev_CMD) {
+				// 次に媒介変数zetaが1に達したときに,P0
+				change_path_flag = true;
+			}
+			// WP半径内に到達したあとで,zetaが4PIに到達したとき
+			if (change_path_flag == true && zeta >= 4*M_PI) {
+				// 目標経路の切り替え: s, zeta の初期化
+				s = 0;
+				zeta_prev = 0;  // zeta 初期化の瞬間に dot_zetaが大きくなるのを防ぐため
+				change_path_flag = false;
+				// P0, P1の更新
+				dist_WPs = get_distance(prev_WP_loc, next_WP_loc);  // 2つのWP間の距離 [m]を更新 ---使わない
+				P0 = location_diff(Path_Origin, prev_WP_loc);  // P0を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P0.y;
+				Py = P0.x;
+				P0.x = Px;
+				P0.y = Py;
+				P1 = location_diff(Path_Origin, next_WP_loc);  // P1を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P1.y;
+				Py = P1.x;
+				P1.x = Px;
+				P1.y = Py;
+				Path_Mode = 0;  // 直線経路モードにセット
+			}
+		}
+		break;
+	// Mode 3: HP -(直線)-> WP1 -(直線)-> WP2 -> -(リサージュ曲線 電通大マーク) -> WP3 -(直線)-> WP4 ...
+	// 指定WP -- N個 (何個でも指定可能.ただし,HPはAUTOモードに切り替えた地点が割り当てられる.)
+	case 3:
+		if (Path_Mode == 0) {
+			// AUTOモードに切り替わり,WPがセットされたとき
+			if (zeta < 0.1 && i_now_CMD != i_prev_CMD) {
+				// 直線経路を更新(初回なので定義)する
+				// 目標経路の初期位置 緯度・経度の設定
+				//WP0.lat = g.TPARAM_Path_Origin_lat;  // 目標経路の初期位置(WP0) 緯度 [1e-7*deg]
+				//WP0.lng = g.TPARAM_Path_Origin_lng;  // 目標経路の初期位置(WP0) 経度 [1e-7*deg]
+				//dist_WPs = get_distance(WP0, next_WP_loc);  // 2つのWP間の距離 [m]を更新
+				//P0 = location_diff(Path_Origin, WP0);  // P0をMPで設定した位置にセット: 目標経路中心からの変位(N.E <-> y,x) [m]
+				//Px = P0.y;
+				//Py = P0.x;
+				//P0.x = Px;
+				//P0.y = Py;
+				dist_WPs = get_distance(prev_WP_loc, next_WP_loc);  // 2つのWP間の距離 [m]を更新
+				P0 = location_diff(Path_Origin, prev_WP_loc);  // P0を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P0.y;
+				Py = P0.x;
+				P0.x = Px;
+				P0.y = Py;
+				P1 = location_diff(Path_Origin, next_WP_loc);  // P1を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P1.y;
+				Py = P1.x;
+				P1.x = Px;
+				P1.y = Py;
+			}
+			// WP半径内に到達し,WPが新たにセットされたとき
+			else if (zeta >= 0.1 && i_now_CMD != i_prev_CMD) {
+				// 次に媒介変数zetaが1に達したときに,P0
+				change_path_flag = true;
+			}
+			// WP半径内に到達したあとで,zetaが1に到達したとき
+			if (change_path_flag == true && zeta >= 1) {
+				// 目標経路の切り替え: s, zeta の初期化
+				s = 0;
+				zeta_prev = 0;  // zeta 初期化の瞬間に dot_zetaが大きくなるのを防ぐため
+				change_path_flag = false;
+				// P0, P1の更新
+				dist_WPs = get_distance(prev_WP_loc, next_WP_loc);  // 2つのWP間の距離 [m]を更新 ---使わない
+				P0 = location_diff(Path_Origin, prev_WP_loc);  // P0を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P0.y;
+				Py = P0.x;
+				P0.x = Px;
+				P0.y = Py;
+				P1 = location_diff(Path_Origin, next_WP_loc);  // P1を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P1.y;
+				Py = P1.x;
+				P1.x = Px;
+				P1.y = Py;
+				if (i_now_CMD == 3) {
+					P1.x -= g.TPARAM_r;
+					P1.y -= g.TPARAM_r;
+					Path_Mode = 3;  // リサージュ曲線（電通大マーク）経路モードにセット
+				}
+			}
+		}
+		if (Path_Mode == 3) {
+			// WP半径内に到達し,WPが新たにセットされたとき
+			if (zeta >= 0.1 && i_now_CMD != i_prev_CMD) {
+				// 次に媒介変数zetaが1に達したときに,P0
+				change_path_flag = true;
+			}
+			// WP半径内に到達したあとで,zetaがPIに到達したとき
+			if (change_path_flag == true && zeta >= M_PI) {
+				// 目標経路の切り替え: s, zeta の初期化
+				s = 0;
+				zeta_prev = 0;  // zeta 初期化の瞬間に dot_zetaが大きくなるのを防ぐため
+				change_path_flag = false;
+				// P0, P1の更新
+				dist_WPs = get_distance(prev_WP_loc, next_WP_loc);  // 2つのWP間の距離 [m]を更新 ---使わない
+				P0 = location_diff(Path_Origin, prev_WP_loc);  // P0を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P0.y;
+				Py = P0.x;
+				P0.x = Px;
+				P0.y = Py;
+				P1 = location_diff(Path_Origin, next_WP_loc);  // P1を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P1.y;
+				Py = P1.x;
+				P1.x = Px;
+				P1.y = Py;
+				Path_Mode = 0;  // 直線経路モードにセット
+			}
+		}
+		break;
+	// Mode 4: WP0 -(直線)-> WP1 -(円経路・左旋回)-> WP2
+	// 指定WP -- N個 (何個でも指定可能.ただし,HPはAUTOモードに切り替えた地点が割り当てられる.)
+	case 4:
+		if (Path_Mode == 0) {
+			// AUTOモードに切り替わり,WPがセットされたとき
+			if (zeta < 0.1 && i_now_CMD != i_prev_CMD) {
+				Path_Mode = 0;  // 直線経路モードにセット
+				// 直線経路を更新(初回なので定義)する
+				// 目標経路の初期位置 緯度・経度の設定
+				WP0.lat = g.TPARAM_Path_Origin_lat;  // 目標経路の初期位置(WP0) 緯度 [1e-7*deg]
+				WP0.lng = g.TPARAM_Path_Origin_lng;  // 目標経路の初期位置(WP0) 経度 [1e-7*deg]
+				dist_WPs = get_distance(WP0, next_WP_loc);  // 2つのWP間の距離 [m]を更新
+				P0 = location_diff(Path_Origin, WP0);  // P0をMPで設定した位置にセット: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P0.y;
+				Py = P0.x;
+				P0.x = Px;
+				P0.y = Py;
+				//P0 = location_diff(Path_Origin, prev_WP_loc);  // P0を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				//Px = P0.y;
+				//Py = P0.x;
+				//P0.x = Px;
+				//P0.y = Py;
+				P1 = location_diff(Path_Origin, next_WP_loc);  // P1を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P1.y;
+				Py = P1.x;
+				P1.x = Px;
+				P1.y = Py;
+			}
+			// WP半径内に到達し,WPが新たにセットされたとき
+			else if (zeta >= 0.1 && i_now_CMD != i_prev_CMD) {
+				// 次に媒介変数zetaが1に達したときに,P0
+				change_path_flag = true;
+			}
+			// WP半径内に到達したあとで,zetaが1に到達したとき
+			if (change_path_flag == true && zeta >= 1) {
+				// 目標経路の切り替え: s, zeta の初期化
+				s = 0;
+				zeta_prev = 0;  // zeta 初期化の瞬間に dot_zetaが大きくなるのを防ぐため
+				change_path_flag = false;
+				// P0, P1の更新
+				dist_WPs = get_distance(prev_WP_loc, next_WP_loc);  // 2つのWP間の距離 [m]を更新 ---使わない
+				P0 = location_diff(Path_Origin, prev_WP_loc);  // P0を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P0.y;
+				Py = P0.x;
+				P0.x = Px;
+				P0.y = Py;
+				P1 = location_diff(Path_Origin, next_WP_loc);  // P1を更新: 目標経路中心からの変位(N.E <-> y,x) [m]
+				Px = P1.y;
+				Py = P1.x;
+				P1.x = Px;
+				P1.y = Py;
+				Path_Mode = 4;  // 円経路 左旋回モードにセット
+			}
+		}
+		if (Path_Mode == 4) {
+			// do nothing
+			// 経路の切り替えはしない  -> 円経路を旋回し続ける
+		}
+		break;
+	}  // switch(Flight_Plan)文の終わり
 
 	float dPdzeta = 0;
 	// 経路の種類を指定する
@@ -1402,9 +1815,9 @@ void Plane::TLAB_generate_2D_Path(void){
 	case 0:
 		zeta = s/dist_WPs;  // 媒介変数の更新 (s の関数)
 		dot_zeta = (zeta - zeta_prev)/dt;  // 使わない
-		x_d = (1 - zeta)*P0.x + zeta*P1.x;  // [m]
+		x_d = (1 - zeta)*P0.x + zeta*P1.x;  // [m] x,y が実際とは逆を意味していることに注意
 		y_d = (1 - zeta)*P0.y + zeta*P1.y;  // [m]
-		chi_d = atan2f((P1.y - P0.y), (P1.x - P0.x));  // [rad]: (-PI ~ PI)
+		chi_d = - atan2f((P1.y - P0.y), (P1.x - P0.x));  // [rad]: (-PI ~ PI)
 		dot_chi_d = 0;
 		kappa = 0;
 		break;
@@ -1428,11 +1841,11 @@ void Plane::TLAB_generate_2D_Path(void){
 		dot_chi_d = dot_zeta;
 		kappa = 2/dist_WPs;
 		break;
-	// Mode 3: 1点のWP(P0)と半径rで定義されるリサージュ曲線経路(電通大マークver.)
+	// Mode 3: 1点のWP(P1)と半径rで定義されるリサージュ曲線経路(電通大マークver.) : 左下が始点
 	case 3:
 		// s と dPdzeta から数値計算でzetaを求める
 		while (1) {
-			dPdzeta = g.TPARAM_r*(25*powf(sinf(5*g.TPARAM_dzeta*i_zeta), 2) + 36*pow(sinf(6*g.TPARAM_dzeta*i_zeta), 2));
+			dPdzeta = g.TPARAM_r*sqrt((25*powf(sinf(5*g.TPARAM_dzeta*i_zeta), 2) + 36*pow(sinf(6*g.TPARAM_dzeta*i_zeta), 2)));
 			s_calc += dPdzeta*g.TPARAM_dzeta;
 			if (s_calc >= s) {
 				zeta = i_zeta*g.TPARAM_dzeta;
@@ -1440,17 +1853,56 @@ void Plane::TLAB_generate_2D_Path(void){
 			}
 			i_zeta ++;
 		}
-		dot_zeta = (zeta - zeta_prev)/dt;  // 0割りが発生し得る(起動時)
-		x_d = g.TPARAM_r*cosf(5.f*zeta) + g.TPARAM_r - P0.x;
-		y_d = g.TPARAM_r*cosf(6.f*zeta) + g.TPARAM_r - P0.y;
-		chi_d = atan2f(6.f/5.f*sinf(6.f*zeta), -sinf(5.f*zeta));
-		dot_chi_d = 30*dot_zeta*(sinf(11*zeta) - 11*sinf(zeta))/(25*cosf(10.f*zeta) + 36*cosf(12*zeta) - 61.f);
-		kappa = (15*fabsf(11.f*sinf(zeta) - sinf(11*zeta))) / (g.TPARAM_r*pow((25*powf(sinf(5*zeta), 2) + 36*powf(sinf(6*zeta), 2)), 1.5f));
+		dot_zeta = (zeta - zeta_prev)/dt;
+		x_d = - g.TPARAM_r*cosf(5.f*zeta) + P1.x;
+		y_d = g.TPARAM_r*cosf(6.f*zeta) + P1.y;
+		chi_d = atan2f(6.f/5.f*sinf(6.f*zeta), sinf(5.f*zeta));
+		dot_chi_d = - 30*dot_zeta*(sinf(11*zeta) - 11*sinf(zeta))/(25*cosf(10*zeta) + 36*cosf(12*zeta) - 61.f);
+		kappa = (15*fabsf(11.f*sinf(zeta) - sinf(11*zeta))) / (g.TPARAM_r*powf((25*powf(sinf(5*zeta) , 2) + 36*powf(sinf(6*zeta) , 2)) , 1.5f));
+		break;
+	// Mode 4: 1点のWP(P1)と半径rで定義される円経路(左旋回): 初期位相 +PI
+	case 4:
+		zeta = s/g.TPARAM_r;
+		dot_zeta = (zeta - zeta_prev)/dt;
+		x_d = - g.TPARAM_r*cosf(zeta) + P1.x;
+		y_d = - g.TPARAM_r*sinf(zeta) + P1.y;
+		chi_d = atan2f(cosf(zeta), sinf(zeta));
+		dot_chi_d = - dot_zeta;
+		kappa = 1.f/g.TPARAM_r;
+		break;
+	// Mode 5: 1点のWP(P1)と半径rで定義される円経路(右旋回): 初期位相 +PI
+	case 5:
+		zeta = s/g.TPARAM_r;
+		dot_zeta = (zeta - zeta_prev)/dt;
+		x_d = - g.TPARAM_r*cosf(zeta) + P1.x;
+		y_d = g.TPARAM_r*sinf(zeta) + P1.y;
+		chi_d = atan2f(-cosf(zeta), sinf(zeta));
+		dot_chi_d = dot_zeta;
+		kappa = 1.f/g.TPARAM_r;
+		break;
+	// Mode 6: 1点のWP(P1)と半径rで定義されるリサージュ曲線経路(8の字ver.) : 初期ベクトルは右上に向かって
+	case 6:
+		// s と dPdzeta から数値計算でzetaを求める
+		while (1) {
+			dPdzeta = g.TPARAM_r*sqrt((25*powf(sinf(5*g.TPARAM_dzeta*i_zeta), 2) + 36*pow(sinf(6*g.TPARAM_dzeta*i_zeta), 2)));
+			s_calc += dPdzeta*g.TPARAM_dzeta;
+			if (s_calc >= s) {
+				zeta = i_zeta*g.TPARAM_dzeta;
+				break;
+			}
+			i_zeta ++;
+		}
+		dot_zeta = (zeta - zeta_prev)/dt;
+		x_d = 2*g.TPARAM_r*sinf(zeta) + P1.x;
+		y_d = g.TPARAM_r*sinf(2*zeta) + P1.y;
+		chi_d = atan2f(- cosf(2*zeta), cosf(zeta));
+		dot_chi_d = - (dot_zeta*sinf(zeta)*(2*powf(sinf(zeta), 2) - 3))/(4*powf(sinf(zeta), 4) - 5*powf(sinf(zeta), 2) + 2);
+		kappa = - (fabsf(sinf(zeta))*(2*powf(sinf(zeta) , 2) - 3))/(2*g.TPARAM_r*powf((4*powf(cosf(zeta) , 4) - 3*powf(cosf(zeta) , 2) + 1) , 1.5f));
 		break;
 	default:
 		zeta = 0;
 		break;
-	}
+	}  // switch(Path_Mode)文の終わり
 }
 
 
@@ -1472,11 +1924,11 @@ int32_t Plane::TLAB_2D_Trace_Controller(void){
 	uint64_t t_prev = t_now;  // 直前の時刻 [us]
 	t_now = AP_HAL::micros64();  // 現在の時刻 [us]
 	dt = (t_now - t_prev)*1.e-6f;  // サンプリング時間間隔 [s]
-	Vector2f xyI = location_diff(Path_Origin, current_loc);  // 現在地点: 目標経路中心からの変位(N.E <-> x,y) [m]
-	xI = xyI.x;  // 慣性x座標(緯度方向) [m]
-	yI = xyI.y;  // 慣性y座標(経度方向) [m]
-	psi = wrap_2PI(ahrs.yaw);  // ヨー角(機首方位角) [rad] (0 ~ 2PI)
-	chi = wrap_2PI(gps.ground_course()*M_PI/180.0f);  // 航路角 [rad]: (0 ~ 2PI)
+	Vector2f xyI = location_diff(Path_Origin, current_loc);  // 現在地点: 目標経路中心からの変位(N.E <-> y,x) [m]
+	xI = xyI.y;  // 慣性x座標(緯度方向) [m]
+	yI = xyI.x;  // 慣性y座標(経度方向) [m]
+	psi = wrap_2PI(ahrs.yaw - M_PI/2);  // ヨー角(機首方位角) [rad] (0 ~ 2PI)
+	chi = wrap_2PI(gps.ground_course()*M_PI/180.0f - M_PI/2);  // 航路角 [rad]: (0 ~ 2PI)
 	v_g = gps.ground_speed();  // 対地速度の大きさ [m/s]
 
 	// 経路生成: 経路情報(目標点 P の慣性座標 etc.)を現在の経路長 s から計算する
@@ -1489,6 +1941,25 @@ int32_t Plane::TLAB_2D_Trace_Controller(void){
 	yF = - sinf(chi_d)*e_xI - cosf(chi_d)*e_yI;  // [m]
 	chiF = wrap_PI(chi_d - chi);  // [rad]: (-PI ~ PI)
 	float X[3] = {xF, yF, chiF};  // 状態変数ベクトル
+
+	// 制御入力 u_x の計算
+	u_x_calc = 0;  // 計算用 u_x の初期化
+	for (int i = 0; i < 3; i++) {
+		u_x_calc -= Fx[i]*X[i];
+	}
+	/*
+	// u_x のファジィ化範囲上限 u_x_max で入力値をカット
+	if (u_x_calc > u_x_max) {
+		u_x = u_x_max;
+	}
+	else if (u_x_calc < - u_x_max) {
+		u_x = - u_x_max;
+	}
+	else {
+		u_x = u_x_calc;
+	}
+	*/
+	u_x = u_x_calc;
 
 	// メンバーシップ関数の計算
 	// 非線形項
@@ -1523,33 +1994,17 @@ int32_t Plane::TLAB_2D_Trace_Controller(void){
 		M1 = 0;
 		M2 = 1;
 	}
-	// メンバーシップ関数 h[1]~h[4] の計算
-	h[0] = K1*M1;
-	h[1] = K2*M1;
-	h[2] = K1*M2;
-	h[3] = K2*M2;
-
-	// 制御入力 u_x の計算
-	u_x_calc = 0;  // 計算用 u_x の初期化
-	for (int i = 0; i < 3; i++) {
-		u_x_calc -= Fx[i]*X[i];
-	}
-	// u_x のファジィ化範囲上限 u_x_max で入力値をカット
-	if (u_x_calc > u_x_max) {
-		u_x = u_x_max;
-	}
-	else if (u_x_calc < - u_x_max) {
-		u_x = - u_x_max;
-	}
-	else {
-		u_x = u_x_calc;
-	}
+	// メンバーシップ関数  h_chi[1] ~ h_chi[4] の計算
+	h_chi[0] = K1*M1;
+	h_chi[1] = K2*M1;
+	h_chi[2] = K1*M2;
+	h_chi[3] = K2*M2;
 
 	// 制御入力 u_chi の計算
 	float u_chi_calc = 0;  // 計算用
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 3; j++) {
-			u_chi_calc -= Fchi[i][j]*X[j];
+			u_chi_calc -= h_chi[i]*Fchi[i][j]*X[j];
 		}
 	}
 	u_chi = u_chi_calc;
@@ -1558,10 +2013,13 @@ int32_t Plane::TLAB_2D_Trace_Controller(void){
 	ds = u_x + v_g*cosf(chiF);  // 目標点 P の移動速度 [m/s]
 	s += ds*dt;  // 経路長の更新式 [m]
 
-	// u_chi [rad/s] をコントロールバー角度 servo [cdeg] へ変換
-    d_angle = static_cast<int32_t>(1/k*v_g/v_a/cosf(chi - psi)*(-u_chi + dot_chi_d)*100.0f*180.0f/M_PI);  // [cdeg]
-    bar_angle = d_angle + g.TPARAM_servo_neutral*100;  // [cdeg]
-    return bar_angle;
+	// u_chi [rad/s] をコントロールバー角度 bar_angle, サーボモーター角度 servo [cdeg] へ変換
+    d_angle = static_cast<int32_t>(1/k_prop_const*v_g/v_a/cosf(chi - psi)*(-u_chi + dot_chi_d)*100.0f*180.0f/M_PI);  // [cdeg]
+    bar_angle = d_angle + g.TPARAM_servo_neutral*100;  // コントロールバー角度 [cdeg]
+    // Changed by Kaito Yamamoto 2021.08.11.
+    u = bar_angle/100.f*M_PI/180.f;  // [cdeg] --> [rad]
+    servo = static_cast<int32_t>(asinf(constrain_float(58.0f / 29.0f * sinf(u), -1, 1))*100.0f*180.0f/M_PI);  // サーボモーター角度 [cdeg]
+    return servo;
 }
 
 

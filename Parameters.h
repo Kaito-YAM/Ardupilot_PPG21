@@ -401,10 +401,11 @@ public:
         k_param_TPARAM_LQR_f2,
         k_param_TPARAM_LQR_f3,
         k_param_TPARAM_LQR_f4,
+        k_param_TPARAM_c_alt,
 
         // Added by Kaito Yamamoto 2021.07.12.
         k_param_TPARAM_v_a,
-        //k_param_TPARAM_k,
+        k_param_TPARAM_k_prop_const,
         k_param_TPARAM_Path_Origin_lat,
         k_param_TPARAM_Path_Origin_lng,
         k_param_TPARAM_Flight_Plan,  // Changed by Kaito Yamamoto 2021.08.05.
@@ -431,6 +432,7 @@ public:
         k_param_TPARAM_chiF_max_deg,
         k_param_TPARAM_r,  // Added by Kaito Yamamoto 2021.08.05.
         k_param_TPARAM_dzeta,  // Added by Kaito Yamamoto 2021.08.05.
+        k_param_TPARAM_Bar_Control_Mode,  // Added by Kaito Yamamoto 2021.08.15.
     };
 
     AP_Int16 format_version;
@@ -662,10 +664,11 @@ public:
     AP_Float TPARAM_LQR_f2;
     AP_Float TPARAM_LQR_f3;
     AP_Float TPARAM_LQR_f4;
+    AP_Int8 TPARAM_c_alt;
 
     // Added by Kaito Yamamoto 2021.07.12.
     AP_Float TPARAM_v_a;
-    //AP_Float TPARAM_k;
+    AP_Float TPARAM_k_prop_const;  // Added by Kaito Yamamoto 2021.08.06.
     AP_Int8  TPARAM_Flight_Plan;  // Changed by Kaito Yamamoto 2021.08.05.
     AP_Int32 TPARAM_Path_Origin_lat;
     AP_Int32 TPARAM_Path_Origin_lng;
@@ -692,6 +695,7 @@ public:
     AP_Float TPARAM_chiF_max_deg;
     AP_Float TPARAM_r;  // Added by Kaito Yamamoto 2021.08.05.
     AP_Float TPARAM_dzeta;  // Added by Kaito Yamamoto 2021.08.05.
+    AP_Int8  TPARAM_Bar_Control_Mode;  // Kaito Yamamoto 2021.08.15.
 
     // RC channels
     RC_Channel rc_1;

@@ -143,6 +143,7 @@ enum log_messages {
     LOG_PPG_2D_1_MSG,  // Added by Kaito Yamamoto 2021.07.21.
     LOG_PPG_2D_2_MSG,  // Added by Kaito Yamamoto 2021.07.21.
     LOG_PPG_2D_3_MSG,  // Added by Kaito Yamamoto 2021.07.21.
+    LOG_PPG_2D_4_MSG,  // Added by Kaito Yamamoto 2021.08.05.
 };
 
 #define MASK_LOG_ATTITUDE_FAST          (1<<0)

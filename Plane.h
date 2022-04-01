@@ -1142,6 +1142,8 @@ private:
     void init_TLAB_2D_Trace_Controller(void);  // "PPG　2次元経路追従コントローラ"の初期化
     void TLAB_generate_2D_Path(void);  // 目標経路の生成
     int32_t TLAB_2D_Trace_Controller(void);  // "PPG　2次元経路追従コントローラ"
+    // Added by Kaito Yamamoto 2021.08.11.
+    int32_t TLAB_Constant_Output(void);  // 一定のサーボモーター角度 [cdeg]を出力
 
     // 共通変数
     bool init_TLAB_Controller_flag;
@@ -1268,8 +1270,8 @@ private:
     Vector2f P1;
     uint8_t Path_Mode;  // 追従経路の種類を指定(0~255)
     uint8_t Flight_Plan;  // 飛行プラン(Path_Modeをどのように切り替えるか)を指定(0~255)
-    Location Path_Origin;  // 目標経路の原点 GPS座標
-    float k;
+    Location Path_Origin;  // xy座標系の原点 GPS座標
+    float k_prop_const;
     //float v_a;  // 対気速度の大きさ [m/s]: const
     float Fx[3], Fchi[4][3];  // フィードバックゲイン
     float v_g_min, v_g_max;
@@ -1304,7 +1306,7 @@ private:
     float chiF;  // 航路角  [m] (セレ・フレネ座標系)
     float ds;  // 経路長の変化量 [m]
     float K1, K2, M1, M2;
-    float h[4];  // メンバーシップ関数(総和が1)
+    float h_chi[4];  // メンバーシップ関数(総和が1)
     int32_t d_angle, bar_angle;  // 平衡点まわりの角度, コントロールバー角度(平衡点も加味)
 
 
